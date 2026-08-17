@@ -1,12 +1,12 @@
 # `abpool_sample()` specification
 
 ## 1. Purpose
-The function takes a list or vector of inputted estimates and associated variances calculated on multiply imputed datasets.
+The function takes a list or vector of inputted estimates and associated variances or covariance matrices calculated on multiply imputed datasets.
 It then samples from the approximate Bayesian pooling algorithm (ABpool) presented by Phillips, Christodoulou and Steinsaltz (2026).
 Namely, for a user-inputted number of degrees of freedom (df), it samples from a t-distribution with df degrees of freedom, centered at the estimate and with scale parameter determined by its associated variance estimate, for each imputation. 
 
 ## 2. Mathematical definition
-Let $\hat{\theta}^{*(l)}$ be the estimate calculated on the $l$th imputed dataset, with associated variance $U^{*(l)}$.
+Let $\hat{\theta}^{*(l)}$ be a scalar- (or vector-) valued estimate calculated on the $l$th imputed dataset, with associated variance (or variance-covariance matrix) $U^{*(l)}$.
 Let $\nu_{\text{com}}$ be the complete-data degrees of freedom, associated with inference on a complete dataset.
 Let $m$ be the number of imputations.
 For each $l$ in $1, \dots, m$, independently sample
@@ -22,6 +22,7 @@ $$
 \psi^{(l)} \sim t_{\nu_{\mathrm{com}}}(0,1).
 $$
 For $\nu_{\text{com}} = \infty$, the $t$-distribution is replaced by its Gaussian limit.
+Here $U^{*(l)}$ is the scale parameter of the complete-data $t$-approximatio. For finite $\nu_\text{com} > 2$, the variance of the resulting $t$-distribution is given by $U^{*(l)} \frac{\nu_\text{com}}{\nu_\text{com}-2}$.
 ## 3. Inputs
 `estimates`
 For scalar-valued parameters, `estimates` is a numeric vector of length $m$, with $l$th entry `estimates[l]` containing the estimate $\hat{\theta}^{*(l)}$ for each imputed dataset $l = 1, \dots, m$.
@@ -33,15 +34,15 @@ For vector-valued parameters, `variances` is a list of length $m$, with $l$th en
 
 `df`
 The number of complete-data degrees of freedom, $\nu_{\text{com}}$, which is then the degrees of freedom of the $t$-distribution from which ABpool samples.
-Note `df = Inf` corresponds to the Gaussian case, where we sample from a Gaussian of mean `estimates` and variance `variances`.
+Note `df = Inf` is valid and corresponds to the Gaussian case, where we sample from a Gaussian of mean `estimates` and variance `variances`. `df` is a required input.
 
 `J`
-The number of samples to draw for each imputed dataset. Optional input, assumed to be 1 if not specified.
+The number of samples to draw for each imputed dataset. `J` is an optional single positive integer-valued numeric, default J =  1 if not specified.
 
 ## 4. Input conventions
  - List element l corresponds to imputation l
  - Within each parameter vector, parameter order defines the order in the covariance matrix. The kth entry of `estimates[[l]]` should correspond to the kth row/column of `variances[[l]]`
- - Covariance matrices are symmetric positive semi-definite p x p matrices
+ - Scalar variances must be non-negative. Covariance matrices for vector-valued parameters must be symmetric positive semidefinite.
  - Parameter names are optional. Where given, the function will output a warning if the order does not match between `estimates` and `variances`, and across imputations. We will not reorder if the order does not match, but give a warning instead.
  - Automatic-looking names like "1","2","3",... or 1,2,3,... will be ignored in name consistency checks.
 
@@ -61,11 +62,11 @@ rows (m−1)J+1 to mJ: imputation m.
  - If the length of estimates and variances do not match length(estimates) != length(variances)
  - If m <= 0.
  - Scalar case: estimates must be numeric, only contain finite values (not NA, NaN or Inf)
- - Vector case: estimates musts be a list, each element must be numeric, have the same length, all entries finite
+ - Vector case: estimates musts be a list, each element must be a numeric vector (not matrix/array), have the same length, all entries finite
  - Scalar case: variances must be numeric, same length as estimates, all values finite, all values >= 0
- - Vector case: variances must be a list, same length as estimates, each element a matrix, each matrix p x p matching length of estimates entries, entries finite, symmetric positive semi-definite (within numerical tolerance).
+ - Vector case: variances must be a list, same length as estimates, each element a matrix, each matrix p x p matching length of estimates entries, same dimension p across all imputations, entries finite, symmetric positive semi-definite (within numerical tolerance).
  - df must be > 0 or df = Inf. Errors: df < 0, df == 0, df = NA, NaN, NULL, df = -Inf.
- - Error if: J < 1, J non integer, J = NA, J = NaN, J = Inf. Also require length(J) = 1.
+ - Error if: J < 1, J non integer, J = NA, J = NaN, J = Inf, J = -Inf. Also require length(J) = 1.
  
 The function should give an informative error if:
 
@@ -83,6 +84,7 @@ The function should give an informative error if:
 - `J` is missing, non-finite, non-integer, or less than 1.
 
 ## 7. Warnings
+If parameter names are supplied, the function checks their consistency within each imputation and across imputations. If informative names conflict, a warning is generated. Names are never used to reorder parameters. Automatic positional names such as "1", "2", ... are ignored.
  - Warning if informative parameter names differ between the estimate vector and corresponding covariance matrix, or if informative names are inconsistent across imputations.
  - No warning for the automatic names we agreed to ignore.
  - Possibly something about df being too small so posterior moments are undefined
@@ -99,13 +101,36 @@ Automatic-looking names such as "1", "2", ... are ignored in these checks.
 It is currently undecided whether to warn for small values of `df`. We expect to do this in abpool rather than abpool_sample.
 
 ## 8. Statistical requirements
-   Mathematical/statistical conditions required of inputs.
+The function assumes that the user-supplied estimates and covariances are appropriate estimates of the complete-data posterior location and scale parameters for each imputation.
+The variance matrices must be positive semi-definite, or for scalar variances these must be positive.
+The degrees of freedom must be positive.
+Context on df: The mean exists if df > 1, the variance exists if df > 2, skewness if df > 3 and kurtosis if df > 4. df = Inf corresponds to generating from a Gaussian.
+We will require df > 0, and may give a warning if df < 4.
 
 ## 9. Randomness
-   How random-number generation and reproducibility work.
+   The function does not take a seed argument. Reproducibility is obtained using set.seed() in the usual R manner.
 
 ## 10. Computational requirements
-    Vectorisation, memory, side effects, etc.
+    Scalar case should use vectorisation.
+    We expect the multivariate case will iterate over imputations.
+    For df = Inf, I expect we should sample from a Gaussian instead of a t with infinite degrees of freedom.
+    The function should not modify the supplied inputs
+    We don't want to repeatedly create unneccessary objects.
 
 ## 11. Minimal examples
-    Scalar and multivariate examples.
+```
+estimates <- c(...)
+covariances <- c(...)
+abpool_sample(estimates, covariances, df = Inf)
+```
+```
+estimates <- list(
+    c(x = ..., z = ...),
+    c(x = ..., z = ...)
+)
+covariances <- list(
+    matrix(..., nrow = 2, ncol=2),
+    matrix(..., nrow = 2, ncol=2)
+)
+abpool_sample(estimates, covariances, df = 19)
+```
