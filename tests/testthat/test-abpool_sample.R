@@ -1,6 +1,8 @@
 valid_scalar_estimates <- 1:3
 valid_scalar_variances <- 1:3
 valid_df <- Inf
+##################################################
+# Input validation
 ################
 # df
 test_that("df accepts valid values", {
@@ -224,3 +226,10 @@ test_that("variances rejects invalid values", {
     abpool_sample(estimates = 1:4, variances = matrix(1:4,ncol=2), df = valid_df)
   )
 })
+########
+# Multi-parameter case
+##################################################
+# Output validation
+######
+# Scalar case
+

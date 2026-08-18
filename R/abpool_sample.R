@@ -57,6 +57,11 @@ abpool_sample <- function(estimates, variances, df, J = 1) {
     if (any(!is.finite(variances))){stop("`variances` must only contain finite values.")}
     if (any(variances<0)){stop("`variances` must only contain non-negative values.")}
 
+    ######
+    # Run function
+    if (is.infinite(df)){samples <- rnorm(n=m,mean=estimates,sd=sqrt(variances))} # Gaussian/normal case
+    else {samples <- rt(n=m,df)*sqrt(variances)+estimates} # t case
+    # Add J > 1 later
   }
   else if (is.list(estimates) && is.list(variances)){
     # Multivariate case
@@ -71,5 +76,5 @@ abpool_sample <- function(estimates, variances, df, J = 1) {
   # 4. Multivariate case
 
   # 5. Return samples
-
+  return(samples)
 }
