@@ -38,11 +38,34 @@ abpool_sample <- function(estimates, variances, df, J = 1) {
     stop("`df` must be a single positive value.")
   }
   # J
-  if (length(J) != 1L || !is.numeric(J) || is.na(J) || J <= 0 || J != round(J) || is.infinite(J) ){
+  if (length(J) != 1L || !is.numeric(J) || J <= 0 || J != round(J) || !is.finite(J) ){
     stop("`J` must be a single positive integer.")
   }
-  # 2. Determine whether this is the scalar or multivariate case
 
+  # 2. Determine whether this is the scalar or multivariate case
+  if (is.numeric(estimates) && is.numeric(variances)){
+    # Scalar case
+    #####
+    # Define m
+    m <- length(estimates)
+
+    # Validate inputs
+    if (m==0){stop("The number of imputations `m` (equal to the length of the estimates and variances vectors) must be positive.")}
+    if (length(variances)!=m){stop("The length of `estimates` and `variances` must be equal.")}
+    if (!is.null(dim(estimates)) || !is.null(dim(variances))){stop("`estimates` and `variances` must be numeric vectors.")}
+    if (any(!is.finite(estimates))){stop("`estimates` must only contain finite values.")}
+    if (any(!is.finite(variances))){stop("`variances` must only contain finite values.")}
+    if (any(variances<0)){stop("`variances` must only contain non-negative values.")}
+
+  }
+  else if (is.list(estimates) && is.list(variances)){
+    # Multivariate case
+
+  }
+  else{
+    stop("`estimates` and `variances` must either both be numeric vectors ",
+         "(scalar case) or both be lists (multiple-parameter case).")
+  }
   # 3. Scalar case
 
   # 4. Multivariate case
