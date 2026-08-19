@@ -232,4 +232,145 @@ test_that("variances rejects invalid values", {
 # Output validation
 ######
 # Scalar case
+######
+# test length
+test_that("scalar output has correct length for J = 1", {
+  # test length df finite
+  samples <- abpool_sample(
+    estimates = valid_scalar_estimates,
+    variances = valid_scalar_variances,
+    df = 10
+  )
+  expect_length(samples, length(valid_scalar_estimates))
+  # test length df infinite
+  samples <- abpool_sample(
+    estimates = valid_scalar_estimates,
+    variances = valid_scalar_variances,
+    df = Inf
+  )
+  expect_length(samples, length(valid_scalar_estimates))
+  # test length df finite length 1
+  samples <- abpool_sample(
+    estimates = 1,
+    variances = 1,
+    df = 10
+  )
+  expect_length(samples, length(1))
+  # test length df infinite length 1
+  samples <- abpool_sample(
+    estimates = 1,
+    variances = 1,
+    df = Inf
+  )
+  expect_length(samples, length(1))
+})
+# test length for J > 1
+test_that("scalar output has correct length for J > 1", {
+  # test length df finite
+  samples <- abpool_sample(
+    estimates = valid_scalar_estimates,
+    variances = valid_scalar_variances,
+    df = 10,
+    J = 2
+  )
+  expect_length(samples, length(rep(valid_scalar_estimates,2)))
+  # test length df infinite
+  samples <- abpool_sample(
+    estimates = valid_scalar_estimates,
+    variances = valid_scalar_variances,
+    df = Inf,
+    J = 2
+  )
+  expect_length(samples, length(rep(valid_scalar_estimates,2)))
+  # test length df finite length 1
+  samples <- abpool_sample(
+    estimates = 1,
+    variances = 1,
+    df = 10,
+    J = 2
+  )
+  expect_length(samples, length(rep(1,2)))
+  # test length df infinite length 1
+  samples <- abpool_sample(
+    estimates = 1,
+    variances = 1,
+    df = Inf,
+    J = 2
+  )
+  expect_length(samples, length(rep(1,2)))
+})
+# test type
+test_that("scalar output has correct type", {
+  # test type df finite
+  samples <- abpool_sample(
+    estimates = valid_scalar_estimates,
+    variances = valid_scalar_variances,
+    df = 10
+  )
+  expect_type(samples, "double")
+  # test type df infinite
+  samples <- abpool_sample(
+    estimates = valid_scalar_estimates,
+    variances = valid_scalar_variances,
+    df = Inf
+  )
+  expect_type(samples, "double")
+  # test type df finite type 1
+  samples <- abpool_sample(
+    estimates = 1,
+    variances = 1,
+    df = 10
+  )
+  expect_type(samples, "double")
+  # test type df infinite type 1
+  samples <- abpool_sample(
+    estimates = 1,
+    variances = 1,
+    df = Inf
+  )
+  expect_type(samples, "double")
+})
+#####
+# J = 1
+test_that("zero variance returns estimates exactly", {
+  samples <- abpool_sample(
+    estimates = c(-2, 0, 4),
+    variances = c(0, 0, 0),
+    df = 10
+  )
+  expect_equal(samples, c(-2, 0, 4))
+})
+test_that("output matches under set.seed", {
+  # Check abpool_sample gives same answer as rnorm df=Inf
+  set.seed(123)
+  actual <- abpool_sample(
+    estimates = valid_scalar_estimates,
+    variances = valid_scalar_variances,
+    df = Inf
+  )
+  set.seed(123)
+  expected <- valid_scalar_estimates + rnorm(3) * sqrt(valid_scalar_variances)
+  expect_equal(actual, expected)
+  # Check abpool_sample gives same answer as rt for df finite
+  set.seed(123)
+  actual <- abpool_sample(
+    estimates = valid_scalar_estimates,
+    variances = valid_scalar_variances,
+    df = 10
+  )
+  set.seed(123)
+  expected <- valid_scalar_estimates + rt(3,df=10) * sqrt(valid_scalar_variances)
+  expect_equal(actual, expected)
+})
+#####
+# J > 1
+test_that("J > 1 gives correct order", {
+  samples <- abpool_sample(
+    estimates = valid_scalar_estimates,
+    variances = rep(0,3),
+    df = 10,
+    J = 2
+  )
 
+  expect_equal(samples, rep(valid_scalar_estimates,each=2))
+})

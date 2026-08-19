@@ -44,7 +44,7 @@ abpool_sample <- function(estimates, variances, df, J = 1) {
 
   # 2. Determine whether this is the scalar or multivariate case
   if (is.numeric(estimates) && is.numeric(variances)){
-    # Scalar case
+    # 3. Scalar case
     #####
     # Define m
     m <- length(estimates)
@@ -59,21 +59,53 @@ abpool_sample <- function(estimates, variances, df, J = 1) {
 
     ######
     # Run function
-    if (is.infinite(df)){samples <- rnorm(n=m,mean=estimates,sd=sqrt(variances))} # Gaussian/normal case
-    else {samples <- rt(n=m,df)*sqrt(variances)+estimates} # t case
-    # Add J > 1 later
+    if (J==1){
+      if (is.infinite(df)){samples <- rnorm(n=m,mean=estimates,sd=sqrt(variances))} # Gaussian/normal case
+      else {samples <- rt(n=m,df)*sqrt(variances)+estimates} # t case
+    }
+    else { # J > 1
+      expanded_estimates <- rep(estimates,each=J)
+      expanded_variances <- rep(variances,each=J)
+      if (is.infinite(df)){samples <- rnorm(n=m*J,mean=expanded_estimates,sd=sqrt(expanded_variances))} # Gaussian/normal case
+      else {samples <- rt(n=m*J,df)*sqrt(expanded_variances)+expanded_estimates} # t case
+    }
   }
   else if (is.list(estimates) && is.list(variances)){
-    # Multivariate case
+    # 4. Multivariate case
+    #####
+    # Define m
+    m <- length(estimates)
+
+    # Validate inputs
+    if (m==0){stop("The number of imputations `m` (equal to the length of the estimates and variances lists) must be positive.")}
+    if (length(variances)!=m){stop("The length of the `estimates` and `variances` lists must be equal.")}
+    if (!all(sapply(estimates,is.numeric)) || !all(sapply(lapply(estimates,dim),is.null)) || !all(sapply(estimates,length)==length(estimates[[1]]))){
+      stop("`estimates` must be a list of numeric vectors of the same length.")
+    }
+    if (!all(sapply(variances,is.numeric)) || !all(sapply(variances,is.matrix)) || !all(sapply(variances,nrow)==sapply(variances,ncol)) || !all(sapply(variances,nrow)==nrow(variances[[1]]))){
+      stop("`variances` must be a list of numeric matrices of the same dimension.")
+    }
+    if (!all(sapply(variances,nrow)==sapply(estimates,length))){
+      stop("The number of rows/columns in each element of `variances` must be equal to the length of each entry in `estimates`.")
+    }
+    if (all(sapply(estimates, function(x) all(is.finite(x))))){stop("`estimates` must only contain finite values.")}
+    if (all(sapply(variances, function(x) all(is.finite(x))))){stop("`variances` must only contain finite values.")}
+
+    tol <- sqrt(.Machine$double.eps)
+    if (!all(sapply(variances,isSymmetric, tol = tol))){stop("Each element of `variances` must be a symmetric matrix.")}
+
+    eigenvalues <- lapply(variances,function(x){eigen(x, symmetric = TRUE, only.values = TRUE)$values})
+    if (!all(sapply(eigenvalues,function(x){all(x >= -tol * abs(x[1]))}))){stop("Each element of `variances` must be a positive semi-definite matrix.")}
+    # Add a test for element names not matching
+
+    ######
+    # Run function
 
   }
   else{
     stop("`estimates` and `variances` must either both be numeric vectors ",
          "(scalar case) or both be lists (multiple-parameter case).")
   }
-  # 3. Scalar case
-
-  # 4. Multivariate case
 
   # 5. Return samples
   return(samples)
