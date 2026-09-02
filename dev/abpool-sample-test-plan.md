@@ -39,11 +39,14 @@ Scalar
 
 Multivariate
 [-] type
+[-] dimensions
 [ ] J = 1, df = Inf
 [ ] J = 1, finite df
 [ ] J > 1, df = Inf
 [ ] J > 1, finite df
-[ ] zero covariance / diagonal covariance
+[-] zero covariance
+[-] perfect correlation
+[ ] diagonal covariance
 [ ] covariance between parameters retained
 [ ] J ordering
 [ ] set.seed correct

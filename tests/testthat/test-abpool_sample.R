@@ -578,3 +578,147 @@ test_that("multivariate output has correct type", {
     J = 2
   )
 })
+#######
+# test dimensions
+test_that("multivariate output has correct dimensions for J = 1", {
+  # test length df finite
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = valid_multi_variances,
+    df = 10
+  )
+  expect_equal(dim(samples), c(length(valid_multi_estimates),length(valid_multi_estimates[[1]])))
+  # test length df infinite
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = valid_multi_variances,
+    df = Inf
+  )
+  expect_equal(dim(samples), c(length(valid_multi_estimates),length(valid_multi_estimates[[1]])))
+  # test length df finite length 1
+  samples <- abpool_sample(
+    estimates = list(c(1,2)),
+    variances = list(variance_mat),
+    df = 10
+  )
+  expect_equal(dim(samples), c(length(list(c(1,2))),length(list(c(1,2))[[1]])))
+  # test length df infinite length 1
+  samples <- abpool_sample(
+    estimates = list(c(1,2)),
+    variances = list(variance_mat),
+    df = Inf
+  )
+  expect_equal(dim(samples), c(length(list(c(1,2))),length(list(c(1,2))[[1]])))
+})
+test_that("multivariate output has correct dimensions for J > 1", {
+  # test length df finite
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = valid_multi_variances,
+    df = 10,
+    J = 2
+  )
+  expect_equal(dim(samples), c(length(valid_multi_estimates)*2,length(valid_multi_estimates[[1]])))
+  # test length df infinite
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = valid_multi_variances,
+    df = Inf,
+    J = 2
+  )
+  expect_equal(dim(samples), c(length(valid_multi_estimates)*2,length(valid_multi_estimates[[1]])))
+  # test length df finite length 1
+  samples <- abpool_sample(
+    estimates = list(c(1,2)),
+    variances = list(variance_mat),
+    df = 10,
+    J = 2
+  )
+  expect_equal(dim(samples), c(length(list(c(1,2)))*2,length(list(c(1,2))[[1]])))
+  # test length df infinite length 1
+  samples <- abpool_sample(
+    estimates = list(c(1,2)),
+    variances = list(variance_mat),
+    df = Inf,
+    J = 2
+  )
+  expect_equal(dim(samples), c(length(list(c(1,2)))*2,length(list(c(1,2))[[1]])))
+})
+#######
+# zero covariance
+zero_cov_mat <- matrix(0, 2, 2)
+zero_multi_variances <- list(zero_cov_mat,zero_cov_mat,zero_cov_mat)
+test_that("multivariate output is correct, and rows ordered correctly, when covariance matrix 0, J = 1", {
+  # test length df finite
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = zero_multi_variances,
+    df = 10
+  )
+  expect_equal(samples, t(vapply(valid_multi_estimates,c,numeric(2))))
+  # test length df infinite
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = zero_multi_variances,
+    df = Inf
+  )
+  expect_equal(samples, t(vapply(valid_multi_estimates,c,numeric(2))))
+})
+test_that("multivariate output is correct, and rows ordered correctly, when covariance matrix 0, J > 1", {
+  # test length df finite
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = zero_multi_variances,
+    df = 10,
+    J = 2
+  )
+  expect_equal(samples, t(vapply(rep(valid_multi_estimates,each=2),c,numeric(2))))
+  # test length df infinite
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = zero_multi_variances,
+    df = Inf,
+    J = 2
+  )
+  expect_equal(samples, t(vapply(rep(valid_multi_estimates,each=2),c,numeric(2))))
+})
+#######
+# Perfect correlation of -1
+zero_multi_estimates <- list(c(x = 0, z = 0), c(x = 0, z = 0), c(x = 0, z = 0) )
+perfect_correlation_mat <- matrix(c(1,-1,-1,1), 2, 2)
+corr_multi_variances <- list(perfect_correlation_mat,perfect_correlation_mat,perfect_correlation_mat)
+test_that("multivariate output captures complete correlation, J = 1", {
+  # test length df finite
+  samples <- abpool_sample(
+    estimates = zero_multi_estimates,
+    variances = corr_multi_variances,
+    df = 10
+  )
+  expect_equal(samples[,1], -samples[,2])
+  # test length df infinite
+  samples <- abpool_sample(
+    estimates = zero_multi_estimates,
+    variances = corr_multi_variances,
+    df = Inf
+  )
+  expect_equal(samples[,1], -samples[,2])
+})
+test_that("multivariate output captures complete correlation, J > 1", {
+  # test length df finite
+  samples <- abpool_sample(
+    estimates = zero_multi_estimates,
+    variances = corr_multi_variances,
+    df = 10,
+    J = 2
+  )
+  expect_equal(samples[,1], -samples[,2])
+  # test length df infinite
+  samples <- abpool_sample(
+    estimates = zero_multi_estimates,
+    variances = corr_multi_variances,
+    df = Inf,
+    J = 2
+  )
+  expect_equal(samples[,1], -samples[,2])
+})
+

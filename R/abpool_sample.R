@@ -104,22 +104,22 @@ abpool_sample <- function(estimates, variances, df, J = 1) {
     if (J==1){
       if (is.infinite(df)){
         # Gaussian/normal case
-        samples <- t(vapply(seq_len(m),function(i) mvtnorm::rmvnorm(n=1,mean=estimates[[i]],sigma=variances[[i]], method = "chol"), numeric(p)))
+        samples <- t(vapply(seq_len(m),function(i) mvtnorm::rmvnorm(n=1,mean=estimates[[i]],sigma=variances[[i]]), numeric(p)))
         }
       else {
         # t case
         # Generate multivariate Gaussian
-        samples <- t(vapply(seq_len(m),function(i) mvtnorm::rmvt(n=1,sigma=variances[[i]], df = df, method = "chol") + estimates[[i]], numeric(p)))
+        samples <- t(vapply(seq_len(m),function(i) mvtnorm::rmvt(n=1,sigma=variances[[i]], df = df) + estimates[[i]], numeric(p)))
         }
     }
     else { # J > 1
       if (is.infinite(df)){
         # Gaussian/normal case
-        samples <- t(vapply(rep(seq_len(m),each=J),function(i) mvtnorm::rmvnorm(n=1,mean=estimates[[i]],sigma=variances[[i]], method = "chol"), numeric(p)))
+        samples <- t(vapply(rep(seq_len(m),each=J),function(i) mvtnorm::rmvnorm(n=1,mean=estimates[[i]],sigma=variances[[i]]), numeric(p)))
       }
       else {
         # t case
-        samples <- t(vapply(rep(seq_len(m),each=J),function(i) mvtnorm::rmvt(n=1,sigma=variances[[i]], df = df, method = "chol") + estimates[[i]], numeric(p)))
+        samples <- t(vapply(rep(seq_len(m),each=J),function(i) mvtnorm::rmvt(n=1,sigma=variances[[i]], df = df) + estimates[[i]], numeric(p)))
       }
     }
     colnames(samples) <- names(estimates[[1]])
