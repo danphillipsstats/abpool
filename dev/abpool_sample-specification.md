@@ -43,6 +43,8 @@ The number of samples to draw for each imputed dataset. `J` is an optional singl
  - List element l corresponds to imputation l
  - Within each parameter vector, parameter order defines the order in the covariance matrix. The kth entry of `estimates[[l]]` should correspond to the kth row/column of `variances[[l]]`
  - Scalar variances must be non-negative. Covariance matrices for vector-valued parameters must be symmetric positive semidefinite.
+ - Currently it is assumed that the estimates and variances are in the same order.
+In future we may add testing for parameter order using parameter names:
  - Parameter names are optional. Where given, the function will output a warning if the order does not match between `estimates` and `variances`, and across imputations. We will not reorder if the order does not match, but give a warning instead.
  - Automatic-looking names like "1","2","3",... or 1,2,3,... will be ignored in name consistency checks.
 
@@ -84,11 +86,15 @@ The function should give an informative error if:
 - `J` is missing, non-finite, non-integer, or less than 1.
 
 ## 7. Warnings
-If parameter names are supplied, the function checks their consistency within each imputation and across imputations. If informative names conflict, a warning is generated. Names are never used to reorder parameters. Automatic positional names such as "1", "2", ... are ignored.
- - Warning if informative parameter names differ between the estimate vector and corresponding covariance matrix, or if informative names are inconsistent across imputations.
- - No warning for the automatic names we agreed to ignore.
  - Possibly something about df being too small so posterior moments are undefined
  - Variance 0?
+
+It is currently undecided whether to warn for small values of `df`. We expect to do this in abpool rather than abpool_sample.
+
+Possible future addition:
+ - If parameter names are supplied, the function checks their consistency within each imputation and across imputations. If informative names conflict, a warning is generated. Names are never used to reorder parameters. Automatic positional names such as "1", "2", ... are ignored.
+ - Warning if informative parameter names differ between the estimate vector and corresponding covariance matrix, or if informative names are inconsistent across imputations.
+ - No warning for the automatic names we agreed to ignore.
 
 The function should give a warning if:
 
@@ -97,8 +103,6 @@ The function should give a warning if:
 - Informative parameter names are inconsistent across imputations.
 
 Automatic-looking names such as "1", "2", ... are ignored in these checks.
-
-It is currently undecided whether to warn for small values of `df`. We expect to do this in abpool rather than abpool_sample.
 
 ## 8. Statistical requirements
 The function assumes that the user-supplied estimates and covariances are appropriate estimates of the complete-data posterior location and scale parameters for each imputation.
