@@ -75,10 +75,10 @@ abpool_sample <- function(estimates, variances, df, J = 1) {
     #####
     # Define m
     m <- length(estimates)
+    if (m==0){stop("The number of imputations `m` (equal to the length of the estimates and variances lists) must be positive.")}
     p <- length(estimates[[1]])
 
     # Validate inputs
-    if (m==0){stop("The number of imputations `m` (equal to the length of the estimates and variances lists) must be positive.")}
     if (length(variances)!=m){stop("The length of the `estimates` and `variances` lists must be equal.")}
     if (!all(sapply(estimates,is.numeric)) || !all(sapply(lapply(estimates,dim),is.null)) || !all(sapply(estimates,length)==p)){
       stop("`estimates` must be a list of numeric vectors of the same length.")
@@ -108,7 +108,6 @@ abpool_sample <- function(estimates, variances, df, J = 1) {
         }
       else {
         # t case
-        # Generate multivariate Gaussian
         samples <- t(vapply(seq_len(m),function(i) mvtnorm::rmvt(n=1,sigma=variances[[i]], df = df) + estimates[[i]], numeric(p)))
         }
     }
