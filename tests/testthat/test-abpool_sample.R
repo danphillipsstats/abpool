@@ -1,3 +1,4 @@
+require(mvtnorm)
 valid_scalar_estimates <- 1:3
 valid_scalar_variances <- 1:3
 valid_df <- Inf
@@ -239,9 +240,13 @@ test_that("estimates rejects invalid values", {
   expect_error(
     abpool_sample(estimates = matrix(1:4,ncol=2), variances = 1:4, df = valid_df)
   )
-  # non-numeric
+  # non-numeric estimates
   expect_error(
     abpool_sample(estimates = c(1,"2",3), variances = 1:3, df = valid_df)
+  )
+  # non-numeric variances
+  expect_error(
+    abpool_sample(estimates = c(1,2,3), variances = c(1,"2",3), df = valid_df)
   )
 })
 #####
@@ -281,8 +286,31 @@ test_that("variances rejects invalid values", {
 ########
 # Multi-parameter case
 test_that("estimates and variances accept valid values", {
+  # standard case
   expect_no_error(
     abpool_sample(valid_multi_estimates, valid_multi_variances, df = valid_df)
+  )
+  expect_no_error(
+    abpool_sample(valid_multi_estimates, valid_multi_variances, df = Inf)
+  )
+  expect_no_error(
+    abpool_sample(valid_multi_estimates, valid_multi_variances, df = valid_df, J = 2)
+  )
+  expect_no_error(
+    abpool_sample(valid_multi_estimates, valid_multi_variances, df = Inf, J = 2)
+  )
+  # p = 1 case
+  expect_no_error(
+    abpool_sample(estimates = list(c(1),c(2),c(3)), variances = list(matrix(1,1,1),matrix(1,1,1),matrix(1, 1, 1)), df = valid_df)
+  )
+  expect_no_error(
+    abpool_sample(estimates = list(c(1),c(2),c(3)), variances = list(matrix(1,1,1),matrix(1,1,1),matrix(1, 1, 1)), df = Inf)
+  )
+  expect_no_error(
+    abpool_sample(estimates = list(c(1),c(2),c(3)), variances = list(matrix(1,1,1),matrix(1,1,1),matrix(1, 1, 1)), df = valid_df, J = 2)
+  )
+  expect_no_error(
+    abpool_sample(estimates = list(c(1),c(2),c(3)), variances = list(matrix(1,1,1),matrix(1,1,1),matrix(1, 1, 1)), df = Inf, J = 2)
   )
 })
 test_that("estimates rejects invalid values", {
@@ -454,7 +482,7 @@ test_that("scalar output has correct length for J > 1", {
   expect_length(samples, length(rep(1,2)))
 })
 # test type
-test_that("scalar output has correct type", {
+test_that("scalar output has correct type and is finite", {
   # test type df finite
   samples <- abpool_sample(
     estimates = valid_scalar_estimates,
@@ -462,6 +490,7 @@ test_that("scalar output has correct type", {
     df = 10
   )
   expect_type(samples, "double")
+  expect_true(all(is.finite(samples)))
   # test type df infinite
   samples <- abpool_sample(
     estimates = valid_scalar_estimates,
@@ -469,6 +498,7 @@ test_that("scalar output has correct type", {
     df = Inf
   )
   expect_type(samples, "double")
+  expect_true(all(is.finite(samples)))
   # test type df finite type 1
   samples <- abpool_sample(
     estimates = 1,
@@ -476,6 +506,7 @@ test_that("scalar output has correct type", {
     df = 10
   )
   expect_type(samples, "double")
+  expect_true(all(is.finite(samples)))
   # test type df infinite type 1
   samples <- abpool_sample(
     estimates = 1,
@@ -483,6 +514,7 @@ test_that("scalar output has correct type", {
     df = Inf
   )
   expect_type(samples, "double")
+  expect_true(all(is.finite(samples)))
 })
 #####
 # J = 1
@@ -525,15 +557,22 @@ test_that("J > 1 gives correct order", {
     df = 10,
     J = 2
   )
-
   expect_equal(samples, rep(valid_scalar_estimates,each=2))
 })
-
+test_that("zero variance returns estimates exactly", {
+  samples <- abpool_sample(
+    estimates = c(-2, 0, 4),
+    variances = c(0, 0, 0),
+    df = 10,
+    J = 2
+  )
+  expect_equal(samples, rep(c(-2, 0, 4),each=2))
+})
 ######################
 # Multivariate case
 #######
 # test type
-test_that("multivariate output has correct type", {
+test_that("multivariate output has correct type and is finite", {
   # test type df finite
   samples <- abpool_sample(
     estimates = valid_multi_estimates,
@@ -541,6 +580,7 @@ test_that("multivariate output has correct type", {
     df = 10
   )
   expect_type(samples, "double")
+  expect_true(all(is.finite(samples)))
   # test type df infinite
   samples <- abpool_sample(
     estimates = valid_multi_estimates,
@@ -548,6 +588,7 @@ test_that("multivariate output has correct type", {
     df = Inf
   )
   expect_type(samples, "double")
+  expect_true(all(is.finite(samples)))
   # test type df finite type m = 1
   samples <- abpool_sample(
     estimates = list(c(1,2)),
@@ -555,6 +596,7 @@ test_that("multivariate output has correct type", {
     df = 10
   )
   expect_type(samples, "double")
+  expect_true(all(is.finite(samples)))
   # test type df infinite type m = 1
   samples <- abpool_sample(
     estimates = list(c(1,2)),
@@ -570,6 +612,7 @@ test_that("multivariate output has correct type", {
     J = 2
   )
   expect_type(samples, "double")
+  expect_true(all(is.finite(samples)))
   # test type df infinite
   samples <- abpool_sample(
     estimates = valid_multi_estimates,
@@ -577,32 +620,34 @@ test_that("multivariate output has correct type", {
     df = Inf,
     J = 2
   )
+  expect_type(samples, "double")
+  expect_true(all(is.finite(samples)))
 })
 #######
 # test dimensions
 test_that("multivariate output has correct dimensions for J = 1", {
-  # test length df finite
+  # test dims df finite
   samples <- abpool_sample(
     estimates = valid_multi_estimates,
     variances = valid_multi_variances,
     df = 10
   )
   expect_equal(dim(samples), c(length(valid_multi_estimates),length(valid_multi_estimates[[1]])))
-  # test length df infinite
+  # test dims df infinite
   samples <- abpool_sample(
     estimates = valid_multi_estimates,
     variances = valid_multi_variances,
     df = Inf
   )
   expect_equal(dim(samples), c(length(valid_multi_estimates),length(valid_multi_estimates[[1]])))
-  # test length df finite length 1
+  # test dims df finite length 1
   samples <- abpool_sample(
     estimates = list(c(1,2)),
     variances = list(variance_mat),
     df = 10
   )
   expect_equal(dim(samples), c(length(list(c(1,2))),length(list(c(1,2))[[1]])))
-  # test length df infinite length 1
+  # test dims df infinite length 1
   samples <- abpool_sample(
     estimates = list(c(1,2)),
     variances = list(variance_mat),
@@ -611,7 +656,7 @@ test_that("multivariate output has correct dimensions for J = 1", {
   expect_equal(dim(samples), c(length(list(c(1,2))),length(list(c(1,2))[[1]])))
 })
 test_that("multivariate output has correct dimensions for J > 1", {
-  # test length df finite
+  # test dims df finite
   samples <- abpool_sample(
     estimates = valid_multi_estimates,
     variances = valid_multi_variances,
@@ -619,7 +664,7 @@ test_that("multivariate output has correct dimensions for J > 1", {
     J = 2
   )
   expect_equal(dim(samples), c(length(valid_multi_estimates)*2,length(valid_multi_estimates[[1]])))
-  # test length df infinite
+  # test dims df infinite
   samples <- abpool_sample(
     estimates = valid_multi_estimates,
     variances = valid_multi_variances,
@@ -627,7 +672,7 @@ test_that("multivariate output has correct dimensions for J > 1", {
     J = 2
   )
   expect_equal(dim(samples), c(length(valid_multi_estimates)*2,length(valid_multi_estimates[[1]])))
-  # test length df finite length 1
+  # test dims df finite length 1
   samples <- abpool_sample(
     estimates = list(c(1,2)),
     variances = list(variance_mat),
@@ -635,7 +680,7 @@ test_that("multivariate output has correct dimensions for J > 1", {
     J = 2
   )
   expect_equal(dim(samples), c(length(list(c(1,2)))*2,length(list(c(1,2))[[1]])))
-  # test length df infinite length 1
+  # test dims df infinite length 1
   samples <- abpool_sample(
     estimates = list(c(1,2)),
     variances = list(variance_mat),
@@ -649,14 +694,14 @@ test_that("multivariate output has correct dimensions for J > 1", {
 zero_cov_mat <- matrix(0, 2, 2)
 zero_multi_variances <- list(zero_cov_mat,zero_cov_mat,zero_cov_mat)
 test_that("multivariate output is correct, and rows ordered correctly, when covariance matrix 0, J = 1", {
-  # test length df finite
+  # df finite
   samples <- abpool_sample(
     estimates = valid_multi_estimates,
     variances = zero_multi_variances,
     df = 10
   )
   expect_equal(samples, t(vapply(valid_multi_estimates,c,numeric(2))))
-  # test length df infinite
+  # df infinite
   samples <- abpool_sample(
     estimates = valid_multi_estimates,
     variances = zero_multi_variances,
@@ -665,7 +710,7 @@ test_that("multivariate output is correct, and rows ordered correctly, when cova
   expect_equal(samples, t(vapply(valid_multi_estimates,c,numeric(2))))
 })
 test_that("multivariate output is correct, and rows ordered correctly, when covariance matrix 0, J > 1", {
-  # test length df finite
+  # df finite, J > 1
   samples <- abpool_sample(
     estimates = valid_multi_estimates,
     variances = zero_multi_variances,
@@ -673,7 +718,7 @@ test_that("multivariate output is correct, and rows ordered correctly, when cova
     J = 2
   )
   expect_equal(samples, t(vapply(rep(valid_multi_estimates,each=2),c,numeric(2))))
-  # test length df infinite
+  # df infinite, J > 1
   samples <- abpool_sample(
     estimates = valid_multi_estimates,
     variances = zero_multi_variances,
@@ -688,14 +733,14 @@ zero_multi_estimates <- list(c(x = 0, z = 0), c(x = 0, z = 0), c(x = 0, z = 0) )
 perfect_correlation_mat <- matrix(c(1,-1,-1,1), 2, 2)
 corr_multi_variances <- list(perfect_correlation_mat,perfect_correlation_mat,perfect_correlation_mat)
 test_that("multivariate output captures complete correlation, J = 1", {
-  # test length df finite
+  # df finite
   samples <- abpool_sample(
     estimates = zero_multi_estimates,
     variances = corr_multi_variances,
     df = 10
   )
   expect_equal(samples[,1], -samples[,2])
-  # test length df infinite
+  # df infinite
   samples <- abpool_sample(
     estimates = zero_multi_estimates,
     variances = corr_multi_variances,
@@ -704,7 +749,7 @@ test_that("multivariate output captures complete correlation, J = 1", {
   expect_equal(samples[,1], -samples[,2])
 })
 test_that("multivariate output captures complete correlation, J > 1", {
-  # test length df finite
+  # df finite, J > 1
   samples <- abpool_sample(
     estimates = zero_multi_estimates,
     variances = corr_multi_variances,
@@ -712,7 +757,7 @@ test_that("multivariate output captures complete correlation, J > 1", {
     J = 2
   )
   expect_equal(samples[,1], -samples[,2])
-  # test length df infinite
+  # df infinite, J > 1
   samples <- abpool_sample(
     estimates = zero_multi_estimates,
     variances = corr_multi_variances,
@@ -721,4 +766,117 @@ test_that("multivariate output captures complete correlation, J > 1", {
   )
   expect_equal(samples[,1], -samples[,2])
 })
+#########
+# Multivariate column names
+test_that("column names are retained in multivariate case", {
+  # column names df finite
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = valid_multi_variances,
+    df = 10
+  )
+  expect_equal(colnames(samples),names(valid_multi_estimates[[1]]))
+  # column names df infinite
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = valid_multi_variances,
+    df = Inf
+  )
+  expect_equal(colnames(samples),names(valid_multi_estimates[[1]]))
+  # column names df finite, J > 1
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = valid_multi_variances,
+    df = 10,
+    J = 2
+  )
+  expect_equal(colnames(samples),names(valid_multi_estimates[[1]]))
+  # column names df infinite, J > 1
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = valid_multi_variances,
+    df = Inf,
+    J = 2
+  )
+  expect_equal(colnames(samples),names(valid_multi_estimates[[1]]))
+  # column names df finite
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = valid_multi_variances,
+    df = 10
+  )
+  expect_equal(colnames(samples),names(valid_multi_estimates[[1]]))
+  # column names df infinite
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = valid_multi_variances,
+    df = Inf
+  )
+  expect_equal(colnames(samples),names(valid_multi_estimates[[1]]))
+  # column names df finite, J > 1
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = valid_multi_variances,
+    df = 10,
+    J = 2
+  )
+  expect_equal(colnames(samples),names(valid_multi_estimates[[1]]))
+  # column names df infinite, J > 1
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = valid_multi_variances,
+    df = Inf,
+    J = 2
+  )
+  expect_equal(colnames(samples),names(valid_multi_estimates[[1]]))
 
+  # null column names df finite
+  samples <- abpool_sample(
+    estimates = list(c(1,2),c(1,2),c(1,2)),
+    variances = valid_multi_variances,
+    df = 10
+  )
+  expect_null(colnames(samples))
+  # null column names df infinite
+  samples <- abpool_sample(
+    estimates = list(c(1,2),c(1,2),c(1,2)),
+    variances = valid_multi_variances,
+    df = Inf
+  )
+  expect_null(colnames(samples))
+  # null column names df finite, J > 1
+  samples <- abpool_sample(
+    estimates = list(c(1,2),c(1,2),c(1,2)),
+    variances = valid_multi_variances,
+    df = 10,
+    J = 2
+  )
+  expect_null(colnames(samples))
+  # null column names df infinite, J > 1
+  samples <- abpool_sample(
+    estimates = list(c(1,2),c(1,2),c(1,2)),
+    variances = valid_multi_variances,
+    df = Inf,
+    J = 2
+  )
+  expect_null(colnames(samples))
+})
+########################
+# Neither scalar nor multivariate
+test_that("mixed scalar/multivariate input gives error", {
+  # scalar estimates, multivariate variances
+  expect_error(
+    abpool_sample(
+      estimates = 1:3,
+      variances = valid_multi_variances,
+      df = valid_df
+    )
+  )
+  expect_error(
+    abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = 1:3,
+    df = valid_df
+    )
+  )
+})

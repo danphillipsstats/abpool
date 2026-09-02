@@ -33,26 +33,23 @@ Scalar
 [-] J > 1, df = Inf
 [-] J > 1, finite df
 [-] zero variance
-[ ] J ordering
+[-] J ordering
 [-] Type
 [-] set.seed correct
 
 Multivariate
 [-] type
 [-] dimensions
-[ ] J = 1, df = Inf
-[ ] J = 1, finite df
-[ ] J > 1, df = Inf
-[ ] J > 1, finite df
+[-] J = 1, df = Inf
+[-] J = 1, finite df
+[-] J > 1, df = Inf
+[-] J > 1, finite df
 [-] zero covariance
 [-] perfect correlation
-[ ] diagonal covariance
-[ ] covariance between parameters retained
-[ ] J ordering
-[ ] set.seed correct
+[-] J ordering
 
 OUTPUT
-[ ] scalar length
-[ ] scalar type
-[ ] multivariate dimensions
-[ ] multivariate column names (if retained)
+[-] scalar length
+[-] scalar type
+[-] multivariate dimensions
+[-] multivariate column names (if retained)
