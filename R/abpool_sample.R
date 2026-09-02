@@ -89,8 +89,8 @@ abpool_sample <- function(estimates, variances, df, J = 1) {
     if (!all(sapply(variances,nrow)==sapply(estimates,length))){
       stop("The number of rows/columns in each element of `variances` must be equal to the length of each entry in `estimates`.")
     }
-    if (all(sapply(estimates, function(x) all(is.finite(x))))){stop("`estimates` must only contain finite values.")}
-    if (all(sapply(variances, function(x) all(is.finite(x))))){stop("`variances` must only contain finite values.")}
+    if (!all(sapply(estimates, function(x) all(is.finite(x))))){stop("`estimates` must only contain finite values.")}
+    if (!all(sapply(variances, function(x) all(is.finite(x))))){stop("`variances` must only contain finite values.")}
 
     tol <- sqrt(.Machine$double.eps)
     if (!all(sapply(variances,isSymmetric, tol = tol))){stop("Each element of `variances` must be a symmetric matrix.")}
@@ -98,7 +98,7 @@ abpool_sample <- function(estimates, variances, df, J = 1) {
     eigenvalues <- lapply(variances,function(x){eigen(x, symmetric = TRUE, only.values = TRUE)$values})
     if (!all(sapply(eigenvalues,function(x){all(x >= -tol * abs(x[1]))}))){stop("Each element of `variances` must be a positive semi-definite matrix.")}
 
-
+    samples <- NULL # PLACEHOLDER
     ######
     # Run function
 

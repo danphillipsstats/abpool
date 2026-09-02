@@ -1,6 +1,9 @@
 valid_scalar_estimates <- 1:3
 valid_scalar_variances <- 1:3
 valid_df <- Inf
+valid_multi_estimates <- list(c(x = 1, z = 2), c(x = 3, z = 4), c(x = 5, z = 6) )
+variance_mat <- matrix(c(1,0.1,0.1,2),2,2)
+valid_multi_variances <- list(variance_mat, variance_mat, variance_mat)
 ##################################################
 # Input validation
 ################
@@ -114,7 +117,7 @@ test_that("J rejects invalid values", {
 # Scalar case
 #####
 # m
-test_that("m accepts valid values", {
+test_that("m accepts valid values - scalar case", {
   # m = 1
   expect_no_error(
     abpool_sample(
@@ -132,7 +135,25 @@ test_that("m accepts valid values", {
     )
   )
 })
-test_that("m rejects invalid values", {
+test_that("m accepts valid values - multivariate case", {
+  # m = 2
+  expect_no_error(
+    abpool_sample(
+      estimates = list(c(1,2),c(1,2)),
+      variances = list(diag(c(1,1)),diag(c(1,1))),
+      df = valid_df
+    )
+  )
+  # m = 1
+  expect_no_error(
+    abpool_sample(
+      estimates = list(c(1,2)),
+      variances = list(diag(c(1,1))),
+      df = valid_df
+    )
+  )
+})
+test_that("m rejects invalid values - scalar case", {
   # 0
   expect_error(
     abpool_sample(
@@ -158,6 +179,33 @@ test_that("m rejects invalid values", {
     )
   )
 })
+test_that("m rejects invalid values - multivariate case", {
+  # 0
+  expect_error(
+    abpool_sample(
+      estimates = list(),
+      variances = list(),
+      valid_df
+    )
+  )
+  # estimates length 0
+  expect_error(
+    abpool_sample(
+      estimates = list(),
+      variances = valid_multi_variances,
+      valid_df
+    )
+  )
+  # length estimates not equal to length variances
+  expect_error(
+    abpool_sample(
+      estimates = valid_multi_estimates,
+      variances = list(variance_mat,variance_mat),
+      valid_df
+    )
+  )
+})
+
 #####
 # estimates
 test_that("estimates accepts valid values", {
@@ -190,6 +238,10 @@ test_that("estimates rejects invalid values", {
   # matrix
   expect_error(
     abpool_sample(estimates = matrix(1:4,ncol=2), variances = 1:4, df = valid_df)
+  )
+  # non-numeric
+  expect_error(
+    abpool_sample(estimates = c(1,"2",3), variances = 1:3, df = valid_df)
   )
 })
 #####
@@ -228,6 +280,108 @@ test_that("variances rejects invalid values", {
 })
 ########
 # Multi-parameter case
+test_that("estimates and variances accept valid values", {
+  expect_no_error(
+    abpool_sample(valid_multi_estimates, valid_multi_variances, df = valid_df)
+  )
+})
+test_that("estimates rejects invalid values", {
+  # Different p for different elements of estimates
+  expect_error(
+    abpool_sample(estimates = list(c(1,2),c(1,2,3),c(1,2)), valid_multi_variances, df = valid_df)
+  )
+  # NULL entry
+  expect_error(
+    abpool_sample(estimates = list(c(1,2),NULL,c(1,2)), valid_multi_variances, df = valid_df)
+  )
+  # NA entry
+  expect_error(
+    abpool_sample(estimates = list(c(1,2),c(1,NA),c(1,2)), valid_multi_variances, df = valid_df)
+  )
+  # NaN entry
+  expect_error(
+    abpool_sample(estimates = list(c(1,2),c(1,NaN),c(1,2)), valid_multi_variances, df = valid_df)
+  )
+  # Inf entry
+  expect_error(
+    abpool_sample(estimates = list(c(1,2),c(1,Inf),c(1,2)), valid_multi_variances, df = valid_df)
+  )
+  # Matrix entry
+  expect_error(
+    abpool_sample(estimates = list(c(1,2),matrix(1:2,ncol=2),c(1,2)), valid_multi_variances, df = valid_df)
+  )
+  # Non-numeric entry
+  expect_error(
+    abpool_sample(estimates = list(c(1,2),c(1,"2"),c(1,2)), valid_multi_variances, df = valid_df)
+  )
+})
+test_that("variances accepts valid values", {
+  # Positive definite
+  expect_no_error(
+    abpool_sample(valid_multi_estimates, list(variance_mat,matrix(c(1,0,0,2),2,2),variance_mat), df = valid_df)
+  )
+  # Singular positive semi-definite
+  expect_no_error(
+    abpool_sample(valid_multi_estimates, list(variance_mat,matrix(c(1, 1, 1, 1),2),variance_mat), df = valid_df)
+  )
+})
+
+test_that("variances rejects invalid values", {
+  # Different p for different elements of variances
+  expect_error(
+    abpool_sample(valid_multi_estimates, variances = list(variance_mat,matrix(c(1,0.1,0.1,0.1,1,0.1,0.1,0.1,2),3,3),variance_mat), df = valid_df)
+  )
+  # NULL entry
+  expect_error(
+    abpool_sample(valid_multi_estimates, variances = list(variance_mat,NULL,variance_mat), df = valid_df)
+  )
+  # NA entry
+  expect_error(
+    abpool_sample(valid_multi_estimates, variances = list(variance_mat,matrix(c(1,NA,0,2)),variance_mat), df = valid_df)
+  )
+  # NaN entry
+  expect_error(
+    abpool_sample(valid_multi_estimates, variances = list(variance_mat,matrix(c(1,NaN,0,2)),variance_mat), df = valid_df)
+  )
+  # Inf entry
+  expect_error(
+    abpool_sample(valid_multi_estimates, variances = list(variance_mat,matrix(c(Inf,0,0,2)),variance_mat), df = valid_df)
+  )
+  # Vector entry
+  expect_error(
+    abpool_sample(valid_multi_estimates, variances = list(variance_mat,c(1,0,0,2),variance_mat), df = valid_df)
+  )
+  # Non-numeric entry
+  expect_error(
+    abpool_sample(valid_multi_estimates, variances = list(variance_mat,matrix(c(1,0,0,"2")),variance_mat), df = valid_df)
+  )
+  # Non-square
+  expect_error(
+    abpool_sample(valid_multi_estimates,
+                  variances = list(matrix(c(1,0.1,0.1,0.1,0.1,2),2),matrix(c(1,0.1,0.1,0.1,0.1,2),2),matrix(c(1,0.1,0.1,0.1,0.1,2),2)),
+                  df = valid_df)
+  )
+  # Non-symmetric
+  expect_error(
+    abpool_sample(valid_multi_estimates,
+                  variances = list(variance_mat,matrix(c(1,0.1,0,2),2),variance_mat),
+                  df = valid_df)
+  )
+  # Symmetric indefinite
+  expect_error(
+    abpool_sample(valid_multi_estimates, list(variance_mat,matrix(c(1, 2, 2, 1),2),variance_mat), df = valid_df)
+  )
+})
+
+test_that("estimates and variances reject incompatible values", {
+  # Dimensions of estimates and variances don't match
+  expect_error(
+    abpool_sample(
+      estimates = list(c(1,2,3),c(1,2,3),c(1,2,3)),
+      valid_multi_variances,
+      df = valid_df)
+  )
+})
 ##################################################
 # Output validation
 ######
