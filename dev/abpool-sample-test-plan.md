@@ -38,6 +38,7 @@ Scalar
 [-] set.seed correct
 
 Multivariate
+[-] type
 [ ] J = 1, df = Inf
 [ ] J = 1, finite df
 [ ] J > 1, df = Inf

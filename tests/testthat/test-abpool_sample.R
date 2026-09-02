@@ -384,7 +384,7 @@ test_that("estimates and variances reject incompatible values", {
 })
 ##################################################
 # Output validation
-######
+######################
 # Scalar case
 ######
 # test length
@@ -527,4 +527,54 @@ test_that("J > 1 gives correct order", {
   )
 
   expect_equal(samples, rep(valid_scalar_estimates,each=2))
+})
+
+######################
+# Multivariate case
+#######
+# test type
+test_that("multivariate output has correct type", {
+  # test type df finite
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = valid_multi_variances,
+    df = 10
+  )
+  expect_type(samples, "double")
+  # test type df infinite
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = valid_multi_variances,
+    df = Inf
+  )
+  expect_type(samples, "double")
+  # test type df finite type m = 1
+  samples <- abpool_sample(
+    estimates = list(c(1,2)),
+    variances = list(variance_mat),
+    df = 10
+  )
+  expect_type(samples, "double")
+  # test type df infinite type m = 1
+  samples <- abpool_sample(
+    estimates = list(c(1,2)),
+    variances = list(variance_mat),
+    df = Inf
+  )
+  expect_type(samples, "double")
+  # test type df finite J > 1
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = valid_multi_variances,
+    df = 10,
+    J = 2
+  )
+  expect_type(samples, "double")
+  # test type df infinite
+  samples <- abpool_sample(
+    estimates = valid_multi_estimates,
+    variances = valid_multi_variances,
+    df = Inf,
+    J = 2
+  )
 })
