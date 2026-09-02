@@ -75,11 +75,12 @@ abpool_sample <- function(estimates, variances, df, J = 1) {
     #####
     # Define m
     m <- length(estimates)
+    p <- length(estimates[[1]])
 
     # Validate inputs
     if (m==0){stop("The number of imputations `m` (equal to the length of the estimates and variances lists) must be positive.")}
     if (length(variances)!=m){stop("The length of the `estimates` and `variances` lists must be equal.")}
-    if (!all(sapply(estimates,is.numeric)) || !all(sapply(lapply(estimates,dim),is.null)) || !all(sapply(estimates,length)==length(estimates[[1]]))){
+    if (!all(sapply(estimates,is.numeric)) || !all(sapply(lapply(estimates,dim),is.null)) || !all(sapply(estimates,length)==p)){
       stop("`estimates` must be a list of numeric vectors of the same length.")
     }
     if (!all(sapply(variances,is.numeric)) || !all(sapply(variances,is.matrix)) || !all(sapply(variances,nrow)==sapply(variances,ncol)) || !all(sapply(variances,nrow)==nrow(variances[[1]]))){
@@ -96,7 +97,7 @@ abpool_sample <- function(estimates, variances, df, J = 1) {
 
     eigenvalues <- lapply(variances,function(x){eigen(x, symmetric = TRUE, only.values = TRUE)$values})
     if (!all(sapply(eigenvalues,function(x){all(x >= -tol * abs(x[1]))}))){stop("Each element of `variances` must be a positive semi-definite matrix.")}
-    # Add a test for element names not matching
+
 
     ######
     # Run function
