@@ -1,4 +1,3 @@
-require(mvtnorm)
 valid_scalar_estimates <- 1:3
 valid_scalar_variances <- 1:3
 valid_df <- Inf
@@ -34,6 +33,10 @@ test_that("df rejects invalid values", {
   # NA
   expect_error(
     abpool_sample(valid_scalar_estimates,valid_scalar_variances,df=NA)
+  )
+  # NaN
+  expect_error(
+    abpool_sample(valid_scalar_estimates,valid_scalar_variances,df=NaN)
   )
   # NULL
   expect_error(
@@ -317,6 +320,10 @@ test_that("estimates rejects invalid values", {
   # Different p for different elements of estimates
   expect_error(
     abpool_sample(estimates = list(c(1,2),c(1,2,3),c(1,2)), valid_multi_variances, df = valid_df)
+  )
+  # all entries null
+  expect_error(
+    abpool_sample(estimates = list(NULL,NULL,NULL), variances = list(NULL,NULL,NULL), df = valid_df)
   )
   # NULL entry
   expect_error(
@@ -799,37 +806,6 @@ test_that("column names are retained in multivariate case", {
     J = 2
   )
   expect_equal(colnames(samples),names(valid_multi_estimates[[1]]))
-  # column names df finite
-  samples <- abpool_sample(
-    estimates = valid_multi_estimates,
-    variances = valid_multi_variances,
-    df = 10
-  )
-  expect_equal(colnames(samples),names(valid_multi_estimates[[1]]))
-  # column names df infinite
-  samples <- abpool_sample(
-    estimates = valid_multi_estimates,
-    variances = valid_multi_variances,
-    df = Inf
-  )
-  expect_equal(colnames(samples),names(valid_multi_estimates[[1]]))
-  # column names df finite, J > 1
-  samples <- abpool_sample(
-    estimates = valid_multi_estimates,
-    variances = valid_multi_variances,
-    df = 10,
-    J = 2
-  )
-  expect_equal(colnames(samples),names(valid_multi_estimates[[1]]))
-  # column names df infinite, J > 1
-  samples <- abpool_sample(
-    estimates = valid_multi_estimates,
-    variances = valid_multi_variances,
-    df = Inf,
-    J = 2
-  )
-  expect_equal(colnames(samples),names(valid_multi_estimates[[1]]))
-
   # null column names df finite
   samples <- abpool_sample(
     estimates = list(c(1,2),c(1,2),c(1,2)),

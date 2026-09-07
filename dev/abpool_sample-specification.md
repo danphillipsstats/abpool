@@ -11,7 +11,7 @@ Let $\nu_{\text{com}}$ be the complete-data degrees of freedom, associated with 
 Let $m$ be the number of imputations.
 For each $l$ in $1, \dots, m$, independently sample
 $\theta^{*(l)}  \sim t_{\nu_{\text{com}}}(\hat{\theta}^{*(l)}, U^{*(l)})$
-Equivalently,
+Equivalently for the scalar case,
 $$
 \theta^{*(l)}
 =
@@ -21,8 +21,23 @@ $$
 \qquad
 \psi^{(l)} \sim t_{\nu_{\mathrm{com}}}(0,1).
 $$
+Equivalently for the multivariate case,
+$$
+\theta^{*(l)}
+=
+\hat{\theta}^{*(l)}
++
+L^{(l)}Z^{(l)}/\sqrt{T^{(l)}/\nu_{\mathrm{com}}},
+\qquad
+Z^{(l)} \sim N_p(0,I_p), T^{(l)} \sim \Xi^2_{\nu_{\mathrm{com}}}
+$$
+independently, and
+$$
+L^{(l)}L^{(l)}^T = U^{*(l)}
+$$
+
 For $\nu_{\text{com}} = \infty$, the $t$-distribution is replaced by its Gaussian limit.
-Here $U^{*(l)}$ is the scale parameter of the complete-data $t$-approximatio. For finite $\nu_\text{com} > 2$, the variance of the resulting $t$-distribution is given by $U^{*(l)} \frac{\nu_\text{com}}{\nu_\text{com}-2}$.
+Here $U^{*(l)}$ is the scale parameter of the complete-data $t$-approximation. For finite $\nu_\text{com} > 2$, the variance of the resulting $t$-distribution is given by $U^{*(l)} \frac{\nu_\text{com}}{\nu_\text{com}-2}$.
 ## 3. Inputs
 `estimates`
 For scalar-valued parameters, `estimates` is a numeric vector of length $m$, with $l$th entry `estimates[l]` containing the estimate $\hat{\theta}^{*(l)}$ for each imputed dataset $l = 1, \dots, m$.
@@ -52,7 +67,7 @@ In future we may add testing for parameter order using parameter names:
 For a scalar parameter, the function returns a vector containing the posterior draws. 
 For multiple parameters, it returns a matrix with one row per posterior draw and one column per parameter. 
 When J = 1, the $l$th row (or entry, for a scalar parameter) corresponds to a draw from the complete-data posterior approximation given the $lth$ imputation. 
-With J > 1, the total number of posterior draws is $mJ$. In this case the $m(l-1)+j$th row (or entry) corresponds to the jth draw from the complete-data posterior approximation from the lth imputation. 
+With J > 1, the total number of posterior draws is $mJ$. In this case the $J(l-1)+j$th row (or entry) corresponds to the jth draw from the complete-data posterior approximation from the lth imputation. 
 That is, returned draws are ordered:
 rows 1 to J: imputation 1;
 rows J+1 to 2J: imputation 2;
@@ -106,7 +121,7 @@ Automatic-looking names such as "1", "2", ... are ignored in these checks.
 
 ## 8. Statistical requirements
 The function assumes that the user-supplied estimates and covariances are appropriate estimates of the complete-data posterior location and scale parameters for each imputation.
-The variance matrices must be positive semi-definite, or for scalar variances these must be positive.
+The variance matrices must be positive semi-definite, or for scalar variances these must be non-negative.
 The degrees of freedom must be positive.
 Context on df: The mean exists if df > 1, the variance exists if df > 2, skewness if df > 3 and kurtosis if df > 4. df = Inf corresponds to generating from a Gaussian.
 We will require df > 0, and may give a warning if df < 4.

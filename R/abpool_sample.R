@@ -2,10 +2,10 @@
 #'
 #' Sample via approximate Bayesian pooling (ABpool).
 #'
-#' For each element in estimates and variances, from a t-distribution with mean given by estimates, and scale given by variances.
+#' For each element in estimates and variances, sample from a t-distribution with location given by `estimates`, and scale given by `variances`. For `df = Inf`, draws are from the corresponding Gaussian distribution.
 #'
 #' @param estimates Estimates from the imputed datasets.
-#' @param variances Associated variances or variance-covariance matrices.
+#' @param variances Associated variances or variance-covariance matrices for each estimate.
 #' @param df Complete-data degrees of freedom.
 #' @param J Number of samples per imputation.
 #'
@@ -14,17 +14,17 @@
 #' @references Phillips, Christodoulou and Steinsaltz (XXXX)
 #'
 #' @examples
-#' estimates <- c(...)
-#' covariances <- c(...)
+#' estimates <- c(1,2,3)
+#' covariances <- c(1,2,3)
 #' abpool_sample(estimates, covariances, df = Inf)
 #'
 #' estimates <- list(
-#' c(x = ..., z = ...),
-#' c(x = ..., z = ...)
+#' c(x = 1, z = 2),
+#' c(x = 3, z = 4)
 #' )
 #' covariances <- list(
-#'   matrix(..., nrow = 2, ncol=2),
-#'   matrix(..., nrow = 2, ncol=2)
+#'   matrix(c(1,0.1,0.1,2), nrow = 2, ncol=2),
+#'   matrix(c(1,0,0,1), nrow = 2, ncol=2)
 #' )
 #' abpool_sample(estimates, covariances, df = 19)
 #'
@@ -77,6 +77,7 @@ abpool_sample <- function(estimates, variances, df, J = 1) {
     m <- length(estimates)
     if (m==0){stop("The number of imputations `m` (equal to the length of the estimates and variances lists) must be positive.")}
     p <- length(estimates[[1]])
+    if (p==0){stop("The number of parameters `p` (equal to the length of each element in the estimates list) must be positive.")}
 
     # Validate inputs
     if (length(variances)!=m){stop("The length of the `estimates` and `variances` lists must be equal.")}
