@@ -2,10 +2,10 @@
 
 ## 1. Purpose
 The function takes a list of fitted models, or a mira object from mice::with, where the `l`th element contains the model fit on the `l`th imputed dataset.
-The user may specify the relevant parameters, the complete-data degrees of freedom `df`, and the number of samples per imputation `J`.
+The user may specify the relevant parameters, the complete-data degrees of freedom `dfcom`, and the number of samples per imputation `J`.
 `abpool()` then extracts the estimates and variances from the list, and inputs these into the `abpool_sample()` function.
 This samples from the approximate Bayesian pooling algorithm (ABpool) presented by Phillips, Christodoulou and Steinsaltz (2026).
-Namely, for a user-inputted number of degrees of freedom `dfcom`, it samples from a t-distribution with df degrees of freedom, centered at the estimate and with scale parameter determined by its associated variance estimate, for each imputation.
+Namely, for a user-inputted number of degrees of freedom `dfcom`, it samples from a t-distribution with dfcom degrees of freedom, centered at the estimate and with scale parameter determined by its associated variance estimate, for each imputation.
 
 ## 2. Mathematical definition
 Let $\hat{\theta}^{*(l)}$ be a scalar- (or vector-) valued estimate calculated on the $l$th imputed dataset, with associated variance (or variance-covariance matrix) $U^{*(l)}$.
@@ -53,15 +53,12 @@ A vector of parameter names, stating which parameters ABpool should draw samples
 `dfcom`
 The number of complete-data degrees of freedom, $\nu_{\text{com}}$, which is then the degrees of freedom of the $t$-distribution from which ABpool samples.
 Note `dfcom = Inf` is valid and corresponds to sampling from a Gaussian distribution.
+If specified, the user-specified `dfcom` will be used instead of a value extracted from the fitted models.
 If left NULL, `dfcom` will be extracted from `object`, or produce an error if this is not possible.
 We recommend specifying `dfcom` where possible.
 
 `J`
 The number of samples to draw for each imputed dataset. `J` is an optional single positive integer-valued numeric, default J =  1 if not specified.
-
-Consider including:
-`confint` if true, output a confidence interval.
-`rubin` if true, also estimate via Rubin's rules.
 
 ## 4. Output
 results <- abpool(fits)
@@ -81,43 +78,36 @@ The estimates for each imputed dataset
 The variances for each imputed dataset
  - results$dfcom
 The complete-data degrees of freedom
-Possibly also
- - results$confint
-A confidence interval
- - results$rubin
-An output of some kind from Rubin's rules.
+ - results$J
+The number of samples per imputation
 
 ## 5. Function overview
  - Test inputs
  - if `mira` object, convert to list with `fits <- object$analyses`
  - Extract estimates for `parameters` using `coef(fits)`
  - Extract variance-covariance matrix for `parameters` using `vcov(fits)`
- - If `df = NULL`, extract complete-data degrees of freedom using `df.residual(fits)`
- - Run `abpool_sample(estimates,variances,df,J)`
- - Output samples, esimates, variances, df and possibly more.
+ - If dfcom = NULL, extract the complete-data degrees of freedom from the fitted models using the available model-specific method. An error is returned if this cannot be determined.
+ - Run `abpool_sample(estimates,variances,dfcom,J)`
+ - Output samples, esimates, variances, dfcom and possibly more.
 
 ## 6. Errors
  - Note that many errors will be handled by `abpool_sample()`.
  
-
 The function should give an informative error if:
 - The input is not a list
 - There are no imputations.
 - `estimates` or `variances` could not be extracted.
-- `df = NULL` and `df` could not be extracted.
-- `df.residual` gives different values for different entries in the list.
-- `df` is specified and non-finite (other than `Inf`), or not strictly positive.
-- `J` is is missing, non-finite, non-integer, or less than 1.
+- `dfcom = NULL` and `dfcom` could not be extracted.
+- Extracted dfcom gives different values for different entries in the list.
 
 `abpool_sample()` should give an error if:
 - Parameter dimensions are inconsistent across imputations.
 
 ## 7. Warnings
- - Possibly warn if `df.residual` doesn't match the user-inputted `df`?
- - Possibly warn if `df` is small?
+ - Possibly warn if `dfcom` is small?
 
-Context on df: The mean exists if df > 1, the variance exists if df > 2, skewness if df > 3 and kurtosis if df > 4. df = Inf corresponds to generating from a Gaussian.
-We will require df > 0, and may give a warning if df < 4.
+Context on dfcom: The mean exists if dfcom > 1, the variance exists if dfcom > 2, skewness if dfcom > 3 and kurtosis if dfcom > 4. dfcom = Inf corresponds to generating from a Gaussian.
+We will require dfcom > 0, and may give a warning if dfcom < 4.
 
 ## 8. Randomness
    The function does not take a seed argument. Reproducibility is obtained using set.seed() in the usual R manner.
