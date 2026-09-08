@@ -37,3 +37,38 @@
 #'
 #'
 #' @export
+abpool_sample <- function(object, parameters = NULL, dfcom = NULL, J = 1) {
+
+  # 1. Validate inputs
+  if (!is.list(object)){stop("object must be a list of model fits, where the `l`th element gives the model fit to the `l`th imputed dataset, or a `mira` object created by `mice::with()`")}
+
+  # 2. Extract estimates, variances and degrees of freedom
+  # Extract list of model fits
+  if (mice::is.mira(object)){fits <- object$analyses} else {fits <- object}
+  # i) Validate estimates and variances
+  # ii) Get estimates and variances
+  estimates <- lapply(fits,coef)
+  variances <- lapply(fits,vcov)
+  # iii) Get dfcom
+  if (is.null(dfcom)){
+    dfcom.vec <- sapply(fits,df.residual)
+    if (!all(dfcom.vec==dfcom.vec[1])){stop("Extracted values of `dfcom` via `df.residual()` vary between imputations.")} # This error message could be improved
+    # Update to account for Cox model -- see mice::get.dfcom
+    dfcom <- dfcom.vec[1]
+  }
+
+
+  # 3. Sample ABpool
+  samples <- abpool_sample(estimates, variances, dfcom, J = 1)
+  # 4. Output
+  structure(
+    list(
+      samples = samples,
+      estimates = estimates,
+      variances = variances,
+      dfcom = dfcom,
+      J = J
+    ),
+    class = "abpool"
+  )
+}
