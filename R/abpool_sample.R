@@ -1,41 +1,43 @@
 #' abpool_sample
 #'
-#' Sample via approximate Bayesian pooling (ABpool).
+#' Draw samples via approximate Bayesian pooling (ABpool).
 #'
-#' For each element in estimates and variances, sample from a t-distribution with location given by `estimates`, and scale given by `variances`. For `df = Inf`, draws are from the corresponding Gaussian distribution.
+#' For each imputed dataset, sample from a t-distribution with location given by `estimates`, and scale given by `variances`. For `dfcom = Inf`, draws are from the corresponding Gaussian distribution.
 #'
 #' @param estimates Estimates from the imputed datasets.
-#' @param variances Associated variances or variance-covariance matrices for each estimate.
-#' @param df Complete-data degrees of freedom.
+#' @param variances Associated variances or variance-covariance matrices for the estimates from the imputed datasets.
+#' @param dfcom Complete-data degrees of freedom.
 #' @param J Number of samples per imputation.
 #'
-#' @return Posterior samples from approximate Bayesian pooling.
+#'
+#' @return A numeric vector of posterior draws for a scalar parameter, or a
+#' matrix of posterior draws for multiple parameters.
 #'
 #' @references Phillips, Christodoulou and Steinsaltz (XXXX)
 #'
 #' @examples
 #' estimates <- c(1,2,3)
-#' covariances <- c(1,2,3)
-#' abpool_sample(estimates, covariances, df = Inf)
+#' variances <- c(1,2,3)
+#' abpool_sample(estimates, variances, dfcom = Inf)
 #'
 #' estimates <- list(
 #' c(x = 1, z = 2),
 #' c(x = 3, z = 4)
 #' )
-#' covariances <- list(
+#' variances <- list(
 #'   matrix(c(1,0.1,0.1,2), nrow = 2, ncol=2),
 #'   matrix(c(1,0,0,1), nrow = 2, ncol=2)
 #' )
-#' abpool_sample(estimates, covariances, df = 19)
+#' abpool_sample(estimates, variances, dfcom = 19)
 #'
 #'
 #' @export
-abpool_sample <- function(estimates, variances, df, J = 1) {
+abpool_sample <- function(estimates, variances, dfcom, J = 1) {
 
   # 1. Validate inputs
-  # df
-  if (length(df) != 1L || !is.numeric(df) || is.na(df) || df <= 0 ){
-    stop("`df` must be a single positive value.")
+  # dfcom
+  if (length(dfcom) != 1L || !is.numeric(dfcom) || is.na(dfcom) || dfcom <= 0 ){
+    stop("`dfcom` must be a single positive value.")
   }
   # J
   if (length(J) != 1L || !is.numeric(J) || J <= 0 || J != round(J) || !is.finite(J) ){
@@ -60,14 +62,14 @@ abpool_sample <- function(estimates, variances, df, J = 1) {
     ######
     # Run function
     if (J==1){
-      if (is.infinite(df)){samples <- rnorm(n=m,mean=estimates,sd=sqrt(variances))} # Gaussian/normal case
-      else {samples <- rt(n=m,df)*sqrt(variances)+estimates} # t case
+      if (is.infinite(dfcom)){samples <- rnorm(n=m,mean=estimates,sd=sqrt(variances))} # Gaussian/normal case
+      else {samples <- rt(n=m,dfcom)*sqrt(variances)+estimates} # t case
     }
     else { # J > 1
       expanded_estimates <- rep(estimates,each=J)
       expanded_variances <- rep(variances,each=J)
-      if (is.infinite(df)){samples <- rnorm(n=m*J,mean=expanded_estimates,sd=sqrt(expanded_variances))} # Gaussian/normal case
-      else {samples <- rt(n=m*J,df)*sqrt(expanded_variances)+expanded_estimates} # t case
+      if (is.infinite(dfcom)){samples <- rnorm(n=m*J,mean=expanded_estimates,sd=sqrt(expanded_variances))} # Gaussian/normal case
+      else {samples <- rt(n=m*J,dfcom)*sqrt(expanded_variances)+expanded_estimates} # t case
     }
   }
   else if (is.list(estimates) && is.list(variances)){
@@ -103,23 +105,23 @@ abpool_sample <- function(estimates, variances, df, J = 1) {
     ######
     # Run function
     if (J==1){
-      if (is.infinite(df)){
+      if (is.infinite(dfcom)){
         # Gaussian/normal case
         samples <- t(vapply(seq_len(m),function(i) mvtnorm::rmvnorm(n=1,mean=estimates[[i]],sigma=variances[[i]]), numeric(p)))
         }
       else {
         # t case
-        samples <- t(vapply(seq_len(m),function(i) mvtnorm::rmvt(n=1,sigma=variances[[i]], df = df) + estimates[[i]], numeric(p)))
+        samples <- t(vapply(seq_len(m),function(i) mvtnorm::rmvt(n=1,sigma=variances[[i]], df = dfcom) + estimates[[i]], numeric(p)))
         }
     }
     else { # J > 1
-      if (is.infinite(df)){
+      if (is.infinite(dfcom)){
         # Gaussian/normal case
         samples <- t(vapply(rep(seq_len(m),each=J),function(i) mvtnorm::rmvnorm(n=1,mean=estimates[[i]],sigma=variances[[i]]), numeric(p)))
       }
       else {
         # t case
-        samples <- t(vapply(rep(seq_len(m),each=J),function(i) mvtnorm::rmvt(n=1,sigma=variances[[i]], df = df) + estimates[[i]], numeric(p)))
+        samples <- t(vapply(rep(seq_len(m),each=J),function(i) mvtnorm::rmvt(n=1,sigma=variances[[i]], df = dfcom) + estimates[[i]], numeric(p)))
       }
     }
     colnames(samples) <- names(estimates[[1]])
