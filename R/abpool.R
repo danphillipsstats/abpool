@@ -41,11 +41,21 @@ abpool_sample <- function(object, parameters = NULL, dfcom = NULL, J = 1) {
 
   # 1. Validate inputs
   if (!is.list(object)){stop("object must be a list of model fits, where the `l`th element gives the model fit to the `l`th imputed dataset, or a `mira` object created by `mice::with()`")}
+  # OK: NULL OR (character AND !NA AND
+  if (!is.null(parameters)){
+    if(is.numeric(parameters)){
+      # Test for numeric parameters
+    } else if(!is.character(parameters) && (length(parameters)>=1 || !all(!is.na(parameters)))){
+      stop("`parameters` must be a character vector of parameter names, a numeric vector of parameter orders, or NULL, in which case all parameters will be used.")
+    } else("`parameters` must be a character vector of parameter names, a numeric vector of parameter orders, or NULL, in which case all parameters will be used.")
+  }
 
   # 2. Extract estimates, variances and degrees of freedom
   # Extract list of model fits
   if (mice::is.mira(object)){fits <- object$analyses} else {fits <- object}
+  if (length(fits) == 0L){stop("`object` must contain at least one fitted model.")}
   # i) Validate estimates and variances
+
   # ii) Get estimates and variances
   estimates <- lapply(fits,coef)
   variances <- lapply(fits,vcov)
@@ -53,13 +63,13 @@ abpool_sample <- function(object, parameters = NULL, dfcom = NULL, J = 1) {
   if (is.null(dfcom)){
     dfcom.vec <- sapply(fits,df.residual)
     if (!all(dfcom.vec==dfcom.vec[1])){stop("Extracted values of `dfcom` via `df.residual()` vary between imputations.")} # This error message could be improved
-    # Update to account for Cox model -- see mice::get.dfcom
+    # Perhaps update to extract df when not available as n - p and account for Cox model as n - nevent -- see mice::get.dfcom
     dfcom <- dfcom.vec[1]
   }
 
 
   # 3. Sample ABpool
-  samples <- abpool_sample(estimates, variances, dfcom, J = 1)
+  samples <- abpool_sample(estimates, variances, dfcom, J)
   # 4. Output
   structure(
     list(
