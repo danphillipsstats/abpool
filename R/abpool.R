@@ -37,37 +37,76 @@
 #'
 #'
 #' @export
-abpool_sample <- function(object, parameters = NULL, dfcom = NULL, J = 1) {
-
+abpool <- function(object, parameters = NULL, dfcom = NULL, J = 1) {
+  #####
   # 1. Validate inputs
-  if (!is.list(object)){stop("object must be a list of model fits, where the `l`th element gives the model fit to the `l`th imputed dataset, or a `mira` object created by `mice::with()`")}
-  # OK: NULL OR (character AND !NA AND
   if (!is.null(parameters)){
-    if(is.numeric(parameters)){
-      # Test for numeric parameters
-    } else if(!is.character(parameters) && (length(parameters)>=1 || !all(!is.na(parameters)))){
+    if (anyDuplicated(parameters)){stop("`parameters` must not contain duplicate entries.")}
+    valid_vector <- is.null(dim(parameters))
+    valid_type <- is.character(parameters) ||
+      (is.numeric(parameters) && all(parameters==round(parameters)) && all(parameters > 0))
+    valid_values <- length(parameters) >=1 && all(is.finite(parameters))
+    if (!valid_vector || !valid_type || !valid_values){
       stop("`parameters` must be a character vector of parameter names, a numeric vector of parameter orders, or NULL, in which case all parameters will be used.")
-    } else("`parameters` must be a character vector of parameter names, a numeric vector of parameter orders, or NULL, in which case all parameters will be used.")
+    }
   }
 
   # 2. Extract estimates, variances and degrees of freedom
   # Extract list of model fits
-  if (mice::is.mira(object)){fits <- object$analyses} else {fits <- object}
+  if (mice::is.mira(object)){
+    fits <- object$analyses
+  } else if (is.list(object)) {
+      fits <- object
+  } else {
+        stop("object must be a list of model fits, where the `l`th element gives the model fit to the `l`th imputed dataset, or a `mira` object created by `mice::with()`")
+      }
   if (length(fits) == 0L){stop("`object` must contain at least one fitted model.")}
-  # i) Validate estimates and variances
+  m <- length(fits)
 
-  # ii) Get estimates and variances
-  estimates <- lapply(fits,coef)
-  variances <- lapply(fits,vcov)
-  # iii) Get dfcom
+  #####
+  # i) Extract estimates and variances
+  # Extract all estimates and variances
+  estimates_all <- tryCatch(lapply(fits,coef), error = function(e) NULL)
+  if (is.null(estimates_all)){stop("The entries in the list `object` must be such that `coef()` can be applied to them, to extract the estimates.")}
+  variances_all <- tryCatch(lapply(fits,vcov), error = function(e) NULL)
+  if (is.null(variances_all)){stop("The entries in the list `object` must be such that `vcov()` can be applied to them, to extract the variance-covariance matrices.")}
+  # Check parameter names are consistent across estimates and variances
+  coefnames <- lapply(estimates_all, names)
+  colnames <- lapply(variances_all, colnames)
+  rownames <- lapply(variances_all, rownames)
+  if (!all(sapply(coefnames,function(x) identical(x,coefnames[[1]])))){stop("The names of the coefficients extracted from the entries of `object` by `coef` are inconsistent across imputations.")}
+  if (!all(sapply(colnames,function(x) identical(x,colnames[[1]]))) || !all(sapply(rownames,function(x) identical(x,rownames[[1]])))){stop("The names of the coefficients extracted from the entries of `object` by `vcov` are inconsistent across imputations.")}
+  if (!identical(rownames[[1]],colnames[[1]])){stop("The rownames and colnames of the variance matrix extracted from `object` by `vcov()` do not match.")}
+  if (!(all(coefnames[[1]]==colnames[[1]]) && all(coefnames[[1]]==rownames[[1]]))){stop("The names of the coefficients extracted from the entries of `object` by `coef` are inconsistent with those extracted by `vcov`.")}
+  # Check `parameters` are parameter entries (if numeric)
+  if (is.numeric(parameters) && !all(parameters %in% seq_along(estimates_all[[1]]))){stop("`parameters` must be a character vector of parameter names, a numeric vector of parameter orders, or NULL, in which case all parameters will be used.",
+                                                                               "Where a character vector is supplied, the entries must correspond to the names of the parameters extracted from the model fits by `coef()`")}
+  # Check `parameters` are parameter names (if character)
+  if (is.character(parameters) && !all(parameters %in% coefnames[[1]])){stop("`parameters` must be a character vector of parameter names, a numeric vector of parameter orders, or NULL, in which case all parameters will be used.",
+                                                                               "Where a character vector is supplied, the entries must correspond to the names of the parameters extracted from the model fits by `coef()`")}
+  # Choose all parameters (if null)
+  if (is.null(parameters)){parameters <- seq_along(estimates_all[[1]])}
+
+  #####
+  # ii) Get relevant estimates and variances
+  if (length(parameters) > 1){ # Multivariate case
+    estimates <- lapply(estimates_all, function(x) x[parameters])
+    variances <- lapply(variances_all, function(x) x[parameters,parameters,drop = FALSE])
+  } else if (length(parameters) == 1){ # Scalar case
+    estimates <- sapply(estimates_all, function(x) x[parameters])
+    variances <- sapply(variances_all, function(x) x[parameters,parameters,drop = TRUE])
+  }
+  # iii) Get dfcom-
   if (is.null(dfcom)){
-    dfcom.vec <- sapply(fits,df.residual)
+    dfcom.vec <- tryCatch(sapply(fits,df.residual), error = function(e) NULL)
+  if (is.null(dfcom.vec)){stop("Please supply a value of `dfcom`. Usually, an appropriate choice will be one of: Inf, for models where the variance is a deterministic function of the estimate; n - p, for sample size n and number of parameters p; or n - n_event for the Cox model, where n_event is the number of events.",
+                               "If `dfcom` is not supplied, the entries in the list `object` must be such that `df.residual()` can be applied to them, to extract `dfcom`.")}
     if (!all(dfcom.vec==dfcom.vec[1])){stop("Extracted values of `dfcom` via `df.residual()` vary between imputations.")} # This error message could be improved
     # Perhaps update to extract df when not available as n - p and account for Cox model as n - nevent -- see mice::get.dfcom
     dfcom <- dfcom.vec[1]
   }
 
-
+  #####
   # 3. Sample ABpool
   samples <- abpool_sample(estimates, variances, dfcom, J)
   # 4. Output

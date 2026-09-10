@@ -4,14 +4,18 @@ X <- rnorm(n)
 Y <- 1+3*X + rnorm(n)
 X[1:50] <- NA
 m <- 200
-fits <- lapply(1:m, function(i){
+fits.lin <- lapply(1:m, function(i){
   X[1:50] <- rnorm(50)
   lm(Y~X)
 })
+coefnames <- lapply(fits.lin,function(x) names(coef(x)))
+colnames <- lapply(fits.lin,function(x) colnames(vcov(x)))
+rownames <- lapply(fits.lin,function(x) rownames(vcov(x)))
+all(sapply(1:m, function(i) all(coefnames[[i]]==colnames[[i]]) && all(coefnames[[i]]==rownames[[i]])))
 
-lapply(fits,coef)
-lapply(fits,vcov)
-lapply(fits,df.residual)
+dimnames[[1]]
+unlist(dimnames)
+lapply(fits.lin,df.residual)
 
 # list - logistic regression
 require(mice)
@@ -21,14 +25,14 @@ X <- rnorm(n)
 Y <- rbinom(n,size=1,prob=plogis(1+3*X + rnorm(n)))
 X[1:50] <- NA
 m <- 200
-fits <- lapply(1:m, function(i){
+fits.log <- lapply(1:m, function(i){
   X[1:50] <- rnorm(50)
   glm(Y~X, family="binomial")
 })
 
-lapply(fits,coef)
-lapply(fits,vcov)
-lapply(fits,df.residual)
+lapply(fits.log,coef)
+lapply(fits.log,vcov)
+lapply(fits.log,df.residual)
 
 # list - Cox regression
 Hmisc::getHdata(support) # getHdata(support, "all") to view data dictionary
@@ -51,6 +55,7 @@ pred["H0_NA", ] <- 0
 pred["death", ] <- 0
 imp_data_support <- mice(support.data, m = m, method = method, predictorMatrix = pred)
 support.cox.imp <- with(imp_data_support,coxph(as.formula(cox.support.form.char)))
+mice::pool
 support.cox.imp
 lapply(support.cox.imp$analyses,coef)
 lapply(support.cox.imp$analyses,vcov)
