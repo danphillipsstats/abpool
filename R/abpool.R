@@ -20,17 +20,17 @@
 #'
 #' @return An object of class `abpool`. The object is a list containing
 #' \describe{
-#'   \item{samples}{Samples from approximate Bayesian pooling.}
-#'   \item{estimates}{Estimates for each imputed dataset.}
-#'   \item{variances}{Associated variances or variance-covariance matrices
-#'   for each imputed dataset.}
+#'   \item{samples}{Samples from approximate Bayesian pooling. These will either be a vector of length `m`, where just one parameter is sampled from, or an `m x p` matrix, where `p` parameters are sampled from, for `m` the number of imputations.}
+#'   \item{estimates}{Estimates for each imputed dataset. Either a vector of length `m` (scalar case), or a list of length `m`, with each entry a vector of length `p` (multivariate case).}
+#'   \item{variances}{Associated variances or variance-covariance matrices for each imputed dataset. Either a vector of length `m` (scalar case), or a list of length `m`, with each entry a `p x p` matrix (multivariate case).}
 #'   \item{dfcom}{The complete-data degrees of freedom used for sampling.}
 #'   \item{J}{The number of samples drawn per imputed dataset.}
+#'   \item{parameters}{The parameters for which the ABpool samples were drawn.}
 #' }
 #'
 #' @references Phillips, Christodoulou and Steinsaltz (XXXX)
 #'
-#' @seealso [abpool_sample()], [mice::with()]
+#' @seealso [abpool_sample()] to sample from a vector/list of estimates and variances, [mice::with()] to generate a `mira` object containing a list of model fits
 #'
 #' @examples
 #'
