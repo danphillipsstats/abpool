@@ -44,8 +44,8 @@ abpool <- function(object, parameters = NULL, dfcom = NULL, J = 1) {
     if (anyDuplicated(parameters)){stop("`parameters` must not contain duplicate entries.")}
     valid_vector <- is.null(dim(parameters))
     valid_type <- is.character(parameters) ||
-      (is.numeric(parameters) && all(parameters==round(parameters)) && all(parameters > 0))
-    valid_values <- length(parameters) >=1 && all(is.finite(parameters))
+      (is.numeric(parameters) && all(parameters==round(parameters)) && all(parameters > 0) && all(is.finite(parameters)))
+    valid_values <- length(parameters) >=1 && all(!is.na(parameters))
     if (!valid_vector || !valid_type || !valid_values){
       stop("`parameters` must be a character vector of parameter names, a numeric vector of parameter orders, or NULL, in which case all parameters will be used.")
     }
@@ -116,7 +116,8 @@ abpool <- function(object, parameters = NULL, dfcom = NULL, J = 1) {
       estimates = estimates,
       variances = variances,
       dfcom = dfcom,
-      J = J
+      J = J,
+      parameters = parameters
     ),
     class = "abpool"
   )
