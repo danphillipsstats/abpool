@@ -4,12 +4,12 @@ Common
 [-] object type mira
 [-] object type list
 [-] object invalid (length 0, not a list, list of estimates and variances)
-[ ] parameters valid numeric (length 1, > 1)
-[ ] parameters valid character (length 1, > 1)
-[ ] parameters invalid numeric (NA, Inf, neg, larger than p)
-[ ] parameters invalid character (NA, Inf, not a parameter)
-[ ] parameters contains duplicates
-[ ] parameters invalid other (mix of numeric and character, booleian, matrix)
+[-] parameters valid numeric (length 1, > 1)
+[-] parameters valid character (length 1, > 1)
+[-] parameters invalid numeric (NA, Inf, neg, larger than p)
+[-] parameters invalid character (NA, Inf, not a parameter)
+[-] parameters contains duplicates
+[-] parameters invalid other (booleian, matrix)
 [ ] df valid
 [ ] df invalid
 [ ] J valid

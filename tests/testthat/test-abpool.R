@@ -105,3 +105,105 @@ test_that("object rejects invalid values", {
     abpool(list(list_estimates,list_variances), dfcom=Inf, J = 1)
   )
 })
+# parameters
+test_that("parameters accepts valid inputs - character", {
+  # NULL
+  expect_no_error(
+    abpool(fits.lin.mice, parameters=NULL, dfcom=Inf)
+  )
+  # all
+  expect_no_error(
+    abpool(fits.lin.mice, parameters=c("(Intercept)","X"), dfcom=Inf)
+  )
+  # one parameter
+  expect_no_error(
+    abpool(fits.lin.mice, parameters=c("X"), dfcom=Inf)
+  )
+  # spline
+  expect_no_error(
+    abpool(fits.log.mice, parameters=c("splines::bs(X, knots = c(-0.5, 0.5), degree = 3)1"), dfcom=Inf)
+  )
+  # poly
+  expect_no_error(
+    abpool(fits.cox.mice, parameters=c("poly(X, 2)2"), dfcom=Inf)
+  )
+})
+# parameters
+test_that("parameters accepts valid inputs - numeric", {
+  # all
+  expect_no_error(
+    abpool(fits.lin.mice, parameters=c(1,2), dfcom=Inf)
+  )
+  # one parameter
+  expect_no_error(
+    abpool(fits.lin.mice, parameters=c(2), dfcom=Inf)
+  )
+  # spline
+  expect_no_error(
+    abpool(fits.log.mice, parameters=c(1:3), dfcom=Inf)
+  )
+  # poly
+  expect_no_error(
+    abpool(fits.cox.mice, parameters=c(2:3), dfcom=Inf)
+  )
+})
+
+# parameters
+test_that("parameters rejects valid inputs", {
+  expect_error(
+    abpool(fits.lin.mice, parameters="all", dfcom=Inf)
+  )
+  # extras
+  expect_error(
+    abpool(fits.lin.mice, parameters=c("(Intercept)","X","Z","X^2"), dfcom=Inf)
+  )
+  # one incorrect parameter
+  expect_error(
+    abpool(fits.lin.mice, parameters=c("R"), dfcom=Inf)
+  )
+  # 0
+  expect_error(
+    abpool(fits.lin.mice, parameters=c(0), dfcom=Inf)
+  )
+  # negative
+  expect_error(
+    abpool(fits.lin.mice, parameters=-3, dfcom=Inf)
+  )
+  # inf
+  expect_error(
+    abpool(fits.lin.mice, parameters=Inf, dfcom=Inf)
+  )
+  # inf
+  expect_error(
+    abpool(fits.lin.mice, parameters=NA, dfcom=Inf)
+  )
+  # spline
+  expect_error(
+    abpool(fits.log.mice, parameters=1:20, dfcom=Inf)
+  )
+  # duplicates
+  expect_error(
+    abpool(fits.lin.mice, parameters=rep(1,3), dfcom=Inf)
+  )
+  # duplicates
+  expect_error(
+    abpool(fits.lin.mice, parameters=rep("X",3), dfcom=Inf)
+  )
+  # booleian
+  expect_error(
+    abpool(fits.lin.mice, parameters=TRUE, dfcom=Inf)
+  )
+  # booleian
+  expect_error(
+    abpool(fits.lin.mice, parameters=FALSE, dfcom=Inf)
+  )
+  # list
+  expect_error(
+    abpool(fits.lin.mice, parameters=list("(Intercept)","X"), dfcom=Inf)
+  )
+  # matrix
+  expect_error(
+    abpool(fits.lin.mice, parameters=matrix(c(1,2),nrow=1,ncol=2), dfcom=Inf)
+  )
+})
+
