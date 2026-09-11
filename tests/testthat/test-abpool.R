@@ -27,9 +27,8 @@ n <- 500
 X <- rnorm(n)
 Z <- 0.3*X + rnorm(n)
 Y <- rexp(n,rate=exp(-1+3*X+Z+ 0.5*X^2))
-# Administratively censor at 100
 event <- rep(1,length(Y))
-event[which(Y>100)] <- 0
+event[which(Y>100)] <- 0 # Administratively censor at 100
 Y[cens==1] <- 100
 X[1:50] <- NA
 data.cox <- data.frame(Y=Y,X=X,X_square=X^2,Z=Z,event=event)
@@ -55,7 +54,6 @@ X[1:50] <- NA
 data.lin <- data.frame(Y=Y,X=X)
 impute.mice <- mice(data.lin, m = 1, method = "norm", print=FALSE)
 fits.lin.mice.one <- with(impute.mice, lm(Y~X))
-
 ##################################################
 # Input validation
 ################
@@ -425,11 +423,11 @@ test_that("J rejects invalid inputs", {
   )
   # J = vec
   expect_error(
-    abpool(fits.lin.mice, dfcom=Inf, J = rep(1,length(fits.lin.mice$analysis)))
+    abpool(fits.lin.mice, dfcom=Inf, J = rep(1,length(fits.lin.mice$analyses)))
   )
   # J = list
   expect_error(
-    abpool(fits.lin.mice, dfcom=Inf, J = as.list(rep(1,length(fits.lin.mice$analysis))))
+    abpool(fits.lin.mice, dfcom=Inf, J = as.list(rep(1,length(fits.lin.mice$analyses))))
   )
 })
 # m = 1

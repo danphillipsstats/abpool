@@ -86,3 +86,22 @@ fit$analyses
 est1 <- pool(fit)
 ?mice::pool
 
+# mice + lmer
+set.seed(1)
+require(lme4)
+n_id <- 100
+n_rep <- 3
+id <- factor(rep(seq_len(n_id), each = n_rep))
+X <- rnorm(n_id)
+u <- rnorm(n_id)
+Y <- 1 + 2 * rep(X, each = n_rep) + rep(u, each = n_rep) +
+  rnorm(n_id * n_rep)
+X[1:30] <- NA
+data.lmer <- data.frame(id = id, X = rep(X, each = n_rep), Y = Y)
+impute.mice <- mice(data.lmer, m = 200, method = "norm", print = FALSE)
+fits.lmer.mice <- with(
+  impute.mice,
+  lmer(Y ~ X + (1 | id))
+)
+abpool(fits.lmer.mice)
+# Gives an error, so lmer not currently supported.
