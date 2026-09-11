@@ -1,3 +1,5 @@
+#####
+# Models that work
 # mice - linear regression
 set.seed(1)
 require(mice)
@@ -29,7 +31,7 @@ Z <- 0.3*X + rnorm(n)
 Y <- rexp(n,rate=exp(-1+3*X+Z+ 0.5*X^2))
 event <- rep(1,length(Y))
 event[which(Y>100)] <- 0 # Administratively censor at 100
-Y[cens==1] <- 100
+Y[event==0] <- 100
 X[1:50] <- NA
 data.cox <- data.frame(Y=Y,X=X,X_square=X^2,Z=Z,event=event)
 data.cox$cumhaz <- nelsonaalen(data.cox,timevar=Y,statusvar=event)
@@ -54,6 +56,62 @@ X[1:50] <- NA
 data.lin <- data.frame(Y=Y,X=X)
 impute.mice <- mice(data.lin, m = 1, method = "norm", print=FALSE)
 fits.lin.mice.one <- with(impute.mice, lm(Y~X))
+#####
+# models that break
+# mice + lmer - coef doesn't work properly for lmer
+set.seed(1)
+require(lme4)
+n_id <- 100
+n_rep <- 3
+id <- factor(rep(seq_len(n_id), each = n_rep))
+X <- rnorm(n_id)
+u <- rnorm(n_id)
+Y <- 1 + 2 * rep(X, each = n_rep) + rep(u, each = n_rep) +
+  rnorm(n_id * n_rep)
+X[1:30] <- NA
+data.lmer <- data.frame(id = id, X = rep(X, each = n_rep), Y = Y)
+impute.mice <- mice(data.lmer, m = 200, method = "norm", print = FALSE)
+fits.lmer.mice <- with(
+  impute.mice,
+  lmer(Y ~ X + (1 | id))
+)
+# mice - linear regression, estimates fail
+set.seed(1)
+require(mice)
+n <- 100
+X <- rnorm(n)
+Z <- rep(1,n)
+Y <- 1+3*X + Z + rnorm(n)
+X[1:50] <- NA
+data.lin <- data.frame(Y=Y,X=X)
+m <- 200
+impute.mice <- mice(data.lin, m = m, method = "norm", print=FALSE)
+fits.lin.mice.est.error <- with(impute.mice, lm(Y~X+Z))
+# mice - linear regression, df error
+set.seed(1)
+require(mice)
+n <- 100
+X <- rnorm(n)
+Y <- 1+3*X + rnorm(n)
+X[1:50] <- NA
+data.lin <- data.frame(Y=Y,X=X)
+m <- 200
+impute.mice <- mice(data.lin, m = m, method = "norm", print=FALSE)
+impute.mice$imp$X[1,1] <- NA # Make an imputation NA so complete case will ignore this individual in lm, making df.residual = n - p smaller by 1.
+fits.lin.mice.df.error <- with(impute.mice, lm(Y~X))
+# list - linear regression
+n <- 100
+X <- rnorm(n)
+Z <- rnorm(n)
+Y <- 1+3*X + Z + rnorm(n)
+X[1:50] <- NA
+m <- 200
+fits.lin.order.error <- lapply(1:m, function(i){
+  X[1:50] <- rnorm(50)
+  lm(Y~X + Z)
+})
+fits.lin.order.error[[m]] <- lm(Y~Z + X) # Different order
+
 ##################################################
 # Input validation
 ################
@@ -123,6 +181,10 @@ test_that("parameters accepts valid inputs - character", {
   expect_no_error(
     abpool(fits.lin.mice, parameters=c("(Intercept)","X"), dfcom=Inf)
   )
+  # reordered
+  expect_no_error(
+    abpool(fits.lin.mice, parameters=c("X","(Intercept)"), dfcom=Inf)
+  )
   # one parameter
   expect_no_error(
     abpool(fits.lin.mice, parameters=c("X"), dfcom=Inf)
@@ -141,6 +203,10 @@ test_that("parameters accepts valid inputs - numeric", {
   # all
   expect_no_error(
     abpool(fits.lin.mice, parameters=c(1,2), dfcom=Inf)
+  )
+  # reordered
+  expect_no_error(
+    abpool(fits.lin.mice, parameters=c(2,1), dfcom=Inf)
   )
   # one parameter
   expect_no_error(
@@ -440,5 +506,31 @@ test_that("object accepts valid models - type mira and list", {
   # list object
   expect_no_error(
     abpool(fits.lin.mice.one$analyses, dfcom=Inf)
+  )
+})
+#########
+# models
+test_that("model for which coef/vcov fails", {
+  # lmer doesn't work for coef
+  expect_error(
+    abpool(fits.lmer.mice, dfcom=Inf)
+  )
+})
+test_that("model with undefined estimates", {
+  # lmer doesn't work for coef
+  expect_error(
+    abpool(fits.lin.mice.est.error, dfcom=Inf)
+  )
+})
+test_that("model with different df for different imputations", {
+  # lmer doesn't work for coef
+  expect_error(
+    abpool(fits.lin.mice.df.error)
+  )
+})
+test_that("model with different order of parameters", {
+  # lmer doesn't work for coef
+  expect_error(
+    abpool(fits.lin.order.error)
   )
 })

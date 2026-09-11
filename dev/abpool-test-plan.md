@@ -4,8 +4,8 @@ Common
 [-] object type mira
 [-] object type list
 [-] object invalid (length 0, not a list, list of estimates and variances)
-[-] parameters valid numeric (length 1, > 1)
-[-] parameters valid character (length 1, > 1)
+[-] parameters valid numeric (length 1, > 1, reordered)
+[-] parameters valid character (length 1, > 1, reordered)
 [-] parameters invalid numeric (NA, Inf, neg, larger than p)
 [-] parameters invalid character (NA, Inf, not a parameter)
 [-] parameters contains duplicates
@@ -26,21 +26,11 @@ Valid
 [?] Other common classes (mixed models, etc) - possibly add testing in future
 
 Invalid
-[ ] A model which vcov/coef doesn't work for
-[ ] Imputations with infinite parameter/variance estimates
-[ ] Unspecified dfcom, models df.residual won't extract from (Cox etc.)
-[ ] Different n (separately, p) and hence df.residual across elements (can be done by some imputations being NA, and complete case analysis automatically applied by model)
-[ ] Different order of parameters across elements
-
-SPECIFICATION (for both scalar and multivariate)
-[ ] J = 1
-[ ] J > 1
-[ ] dfcom = 19
-[ ] dfcom = Inf
-[ ] parameters = NULL
-[ ] parameters length > 1
-[ ] parameters length 1
-[ ] parameters reordered
+[-] A model which vcov/coef doesn't work for
+[-] Imputations with infinite parameter/variance estimates
+[-] Unspecified dfcom, models df.residual won't extract from (Cox etc.)
+[-] Different n (separately, p) and hence df.residual across elements (can be done by some imputations being NA, and complete case analysis automatically applied by model)
+[-] Different order of parameters across elements
 
 SAMPLING
 [ ] abpool(mira_object,) = abpool(mira_object$analyses)
