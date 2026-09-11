@@ -1,10 +1,9 @@
 INPUT VALIDATION
 
 Common
-[ ] object type mira
-[ ] object type list
-[ ] object invalid (length 0, not a list)
-[ ] object list of estimates and variances (invalid)
+[-] object type mira
+[-] object type list
+[-] object invalid (length 0, not a list, list of estimates and variances)
 [ ] parameters valid numeric (length 1, > 1)
 [ ] parameters valid character (length 1, > 1)
 [ ] parameters invalid numeric (NA, Inf, neg, larger than p)

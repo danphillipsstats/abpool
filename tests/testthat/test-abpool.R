@@ -9,9 +9,9 @@ data.lin <- data.frame(Y=Y,X=X)
 m <- 200
 impute.mice <- mice(data.lin, m = m, method = "norm", print=FALSE)
 fits.lin.mice <- with(impute.mice, lm(Y~X))
-# mice - logistic regression
+# mice - logistic regression with bsplines
 set.seed(1)
-n <- 100
+n <- 1000
 X <- rnorm(n)
 Z <- 0.3*X + rnorm(n)
 Y <- rbinom(n,size=1,prob=plogis(1+3*X+Z + rnorm(n)))
@@ -19,8 +19,8 @@ X[1:50] <- NA
 m <- 200
 data.log <- data.frame(Y=Y,X=X,Z=Z)
 impute.mice <- mice(data.log, m = 200, method = "norm", print=FALSE)
-fits.log.mice <- with(impute.mice, glm(Y~X, family = "binomial"))
-# mice - Cox regression
+fits.log.mice <- with(impute.mice, glm(Y~splines::bs(X, knots = c(-0.5,0.5), degree = 3), family = "binomial"))
+# mice - Cox regression with square
 set.seed(1)
 require(survival)
 n <- 500
@@ -41,13 +41,16 @@ meth["X"] <- "norm"
 meth["X_square"] <- "~I(X^2)"
 impute.cox.mice <- mice(data.cox, m = 200, method = "norm", predictorMatrix = pred, print=FALSE)
 fits.cox.mice <- with(impute.cox.mice, survival::coxph(survival::Surv(Y,event)~poly(X,2)+Z))
-
+# List of estimates and variances
+list_estimates <- list(c(x = 1, z = 2), c(x = 3, z = 4), c(x = 5, z = 6) )
+variance_mat <- matrix(c(1,0.1,0.1,2),2,2)
+list_variances <- list(variance_mat, variance_mat, variance_mat)
 
 ##################################################
 # Input validation
 ################
 # object
-test_that("object accepts valid values", {
+test_that("object accepts valid models - type mira and list", {
   # Linear regression
   # mira object
   expect_no_error(
@@ -74,5 +77,31 @@ test_that("object accepts valid values", {
   # list object
   expect_no_error(
     abpool(fits.cox.mice$analyses, dfcom=Inf)
+  )
+})
+test_that("object rejects invalid values", {
+  # 0 imputations
+  expect_error(
+    abpool(fits.lin.mice$analyses[0], dfcom=Inf)
+  )
+  # Not a list
+  expect_error(
+    abpool(fits.lin.mice$analyses[[1]], dfcom=Inf)
+  )
+  # List of wrong structure
+  expect_error(
+    abpool(list(fits.lin.mice$analyses[1],fits.lin.mice$analyses[2]), dfcom=Inf)
+  )
+  # List not of models
+  expect_error(
+    abpool(list(1:3), dfcom=Inf)
+  )
+  # List of estimates and variances
+  expect_error(
+    abpool(list_estimates,list_variances, dfcom=Inf, J = 1)
+  )
+  # List of estimates and variances
+  expect_error(
+    abpool(list(list_estimates,list_variances), dfcom=Inf, J = 1)
   )
 })
