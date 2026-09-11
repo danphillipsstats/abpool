@@ -149,7 +149,7 @@ test_that("parameters accepts valid inputs - numeric", {
 })
 
 # parameters
-test_that("parameters rejects valid inputs", {
+test_that("parameters rejects invalid inputs", {
   expect_error(
     abpool(fits.lin.mice, parameters="all", dfcom=Inf)
   )
@@ -206,4 +206,118 @@ test_that("parameters rejects valid inputs", {
     abpool(fits.lin.mice, parameters=matrix(c(1,2),nrow=1,ncol=2), dfcom=Inf)
   )
 })
-
+# df
+test_that("df accepts valid inputs", {
+  # df infinite
+  # Linear regression
+  # mira object
+  expect_no_error(
+    abpool(fits.lin.mice, dfcom=Inf)
+  )
+  # list object
+  expect_no_error(
+    abpool(fits.lin.mice$analyses, dfcom=Inf)
+  )
+  # Logistic regression
+  # mira object
+  expect_no_error(
+    abpool(fits.log.mice, dfcom=Inf)
+  )
+  # list object
+  expect_no_error(
+    abpool(fits.log.mice$analyses, dfcom=Inf)
+  )
+  # Cox regression
+  # mira object
+  expect_no_error(
+    abpool(fits.cox.mice, dfcom=Inf)
+  )
+  # list object
+  expect_no_error(
+    abpool(fits.cox.mice$analyses, dfcom=Inf)
+  )
+  # df finite
+  # Linear regression
+  # mira object
+  expect_no_error(
+    abpool(fits.lin.mice, dfcom=19)
+  )
+  # list object
+  expect_no_error(
+    abpool(fits.lin.mice$analyses, dfcom=19)
+  )
+  # Logistic regression
+  # mira object
+  expect_no_error(
+    abpool(fits.log.mice, dfcom=19)
+  )
+  # list object
+  expect_no_error(
+    abpool(fits.log.mice$analyses, dfcom=19)
+  )
+  # Cox regression
+  # mira object
+  expect_no_error(
+    abpool(fits.cox.mice, dfcom=19)
+  )
+  # list object
+  expect_no_error(
+    abpool(fits.cox.mice$analyses, dfcom=19)
+  )
+})
+test_that("df rejects invalid inputs", {
+  expect_error(
+    abpool(fits.lin.mice, dfcom=0)
+  )
+  expect_error(
+    abpool(fits.lin.mice, dfcom=-1)
+  )
+  expect_error(
+    abpool(fits.lin.mice, dfcom=-Inf)
+  )
+  expect_error(
+    abpool(fits.lin.mice, dfcom=NA)
+  )
+  expect_error(
+    abpool(fits.lin.mice, dfcom=NaN)
+  )
+  # vector
+  expect_error(
+    abpool(fits.lin.mice$analyses, dfcom=rep(19,length(fits.lin.mice$analyses)))
+  )
+  # list
+  expect_error(
+    abpool(fits.lin.mice$analyses, dfcom=as.list(rep(19,length(fits.lin.mice$analyses))))
+  )
+})
+test_that("df extracts correctly where available", {
+  # Linear regression
+  # mira object
+  expect_no_error(
+    abpool(fits.lin.mice, dfcom=NULL)
+  )
+  # list object
+  expect_no_error(
+    abpool(fits.lin.mice$analyses, dfcom=NULL)
+  )
+  # Logistic regression
+  # mira object
+  expect_no_error(
+    abpool(fits.log.mice, dfcom=NULL)
+  )
+  # list object
+  expect_no_error(
+    abpool(fits.log.mice$analyses, dfcom=NULL)
+  )
+})
+test_that("Error where df can't be extracted", {
+  # Cox regression
+  # mira object
+  expect_error(
+    abpool(fits.cox.mice, dfcom=NULL)
+  )
+  # list object
+  expect_error(
+    abpool(fits.cox.mice$analyses, dfcom=NULL)
+  )
+})
