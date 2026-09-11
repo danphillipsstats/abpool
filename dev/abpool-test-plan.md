@@ -10,11 +10,12 @@ Common
 [-] parameters invalid character (NA, Inf, not a parameter)
 [-] parameters contains duplicates
 [-] parameters invalid other (booleian, matrix)
-[ ] df valid
-[ ] df invalid
-[ ] J valid
-[ ] J invalid
-[ ] m = 1
+[-] df valid
+[-] df invalid
+[-] df extracted (success/fail)
+[-] J valid
+[-] J invalid
+[-] m = 1
 
 MODELS
 

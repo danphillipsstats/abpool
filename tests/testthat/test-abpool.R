@@ -45,6 +45,16 @@ fits.cox.mice <- with(impute.cox.mice, survival::coxph(survival::Surv(Y,event)~p
 list_estimates <- list(c(x = 1, z = 2), c(x = 3, z = 4), c(x = 5, z = 6) )
 variance_mat <- matrix(c(1,0.1,0.1,2),2,2)
 list_variances <- list(variance_mat, variance_mat, variance_mat)
+# mice - linear regression, m = 1
+set.seed(1)
+require(mice)
+n <- 100
+X <- rnorm(n)
+Y <- 1+3*X + rnorm(n)
+X[1:50] <- NA
+data.lin <- data.frame(Y=Y,X=X)
+impute.mice <- mice(data.lin, m = 1, method = "norm", print=FALSE)
+fits.lin.mice.one <- with(impute.mice, lm(Y~X))
 
 ##################################################
 # Input validation
@@ -319,5 +329,118 @@ test_that("Error where df can't be extracted", {
   # list object
   expect_error(
     abpool(fits.cox.mice$analyses, dfcom=NULL)
+  )
+})
+# J
+test_that("J accepts valid inputs", {
+  # J > 1, vector
+  # Linear regression
+  # mira object
+  expect_no_error(
+    abpool(fits.lin.mice, dfcom=Inf, J = 2)
+  )
+  # list object
+  expect_no_error(
+    abpool(fits.lin.mice$analyses, dfcom=Inf, J = 2)
+  )
+  # Logistic regression
+  # mira object
+  expect_no_error(
+    abpool(fits.log.mice, dfcom=Inf, J = 2)
+  )
+  # list object
+  expect_no_error(
+    abpool(fits.log.mice$analyses, dfcom=Inf, J = 2)
+  )
+  # Cox regression
+  # mira object
+  expect_no_error(
+    abpool(fits.cox.mice, dfcom=Inf, J = 2)
+  )
+  # list object
+  expect_no_error(
+    abpool(fits.cox.mice$analyses, dfcom=Inf, J = 2)
+  )
+  # J > 1, scalar
+  # Linear regression
+  # mira object
+  expect_no_error(
+    abpool(fits.lin.mice, dfcom=Inf, parameters = 1, J = 2)
+  )
+  # list object
+  expect_no_error(
+    abpool(fits.lin.mice$analyses, dfcom=Inf, parameters = 1, J = 2)
+  )
+  # Logistic regression
+  # mira object
+  expect_no_error(
+    abpool(fits.log.mice, dfcom=Inf, parameters = 1, J = 2)
+  )
+  # list object
+  expect_no_error(
+    abpool(fits.log.mice$analyses, dfcom=Inf, parameters = 1, J = 2)
+  )
+  # Cox regression
+  # mira object
+  expect_no_error(
+    abpool(fits.cox.mice, dfcom=Inf, parameters = 1, J = 2)
+  )
+  # list object
+  expect_no_error(
+    abpool(fits.cox.mice$analyses, dfcom=Inf, parameters = 1, J = 2)
+  )
+})
+test_that("J rejects invalid inputs", {
+  # J = 0
+  expect_error(
+    abpool(fits.lin.mice, dfcom=Inf, J = 0)
+  )
+  # J = 0
+  expect_error(
+    abpool(fits.lin.mice, dfcom=Inf, J = "1")
+  )
+  # J = NA
+  expect_error(
+    abpool(fits.lin.mice, dfcom=Inf, J = NA)
+  )
+  # J = Inf
+  expect_error(
+    abpool(fits.lin.mice, dfcom=Inf, J = Inf)
+  )
+  # J = NaN
+  expect_error(
+    abpool(fits.lin.mice, dfcom=Inf, J = NaN)
+  )
+  # J = -1
+  expect_error(
+    abpool(fits.lin.mice, dfcom=Inf, J = -1)
+  )
+  # J = 1.5
+  expect_error(
+    abpool(fits.lin.mice, dfcom=Inf, J = 1.5)
+  )
+  # J = NULL
+  expect_error(
+    abpool(fits.lin.mice, dfcom=Inf, J = NULL)
+  )
+  # J = vec
+  expect_error(
+    abpool(fits.lin.mice, dfcom=Inf, J = rep(1,length(fits.lin.mice$analysis)))
+  )
+  # J = list
+  expect_error(
+    abpool(fits.lin.mice, dfcom=Inf, J = as.list(rep(1,length(fits.lin.mice$analysis))))
+  )
+})
+# m = 1
+test_that("object accepts valid models - type mira and list", {
+  # Linear regression
+  # mira object
+  expect_no_error(
+    abpool(fits.lin.mice.one, dfcom=Inf)
+  )
+  # list object
+  expect_no_error(
+    abpool(fits.lin.mice.one$analyses, dfcom=Inf)
   )
 })
