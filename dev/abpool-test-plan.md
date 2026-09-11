@@ -20,9 +20,10 @@ Common
 MODELS
 
 Valid
-[ ] lm
+[ ] lm (standard, with polynomial/spline terms)
 [ ] glm
 [ ] Cox
+[ ] Other common classes (mixed models, etc)
 
 Invalid
 [ ] A model which vcov/coef doesn't work for

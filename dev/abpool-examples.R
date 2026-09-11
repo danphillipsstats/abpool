@@ -1,3 +1,18 @@
+require(mice)
+# mice - linear regression
+n <- 100
+X <- rnorm(n)
+Y <- 1+3*X + rnorm(n)
+X[1:50] <- NA
+data.lin <- data.frame(Y=Y,X=X)
+m <- 200
+impute.mice <- mice(data.lin, m = 200, method = "norm")
+fits.mice <- with(impute.mice, lm(Y~X))
+fits.lin <- fits.mice$analyses
+coefnames <- lapply(fits.lin,function(x) names(coef(x)))
+colnames <- lapply(fits.lin,function(x) colnames(vcov(x)))
+rownames <- lapply(fits.lin,function(x) rownames(vcov(x)))
+
 # list - linear regression
 n <- 100
 X <- rnorm(n)
