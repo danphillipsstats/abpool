@@ -29,7 +29,7 @@ confint.abpool <- function(object, parm = NULL, level = 0.95, ...) {
   if (is.null(parm)){parm <- object$parameters}
   if (is.numeric(parm)){
     valid_numeric <- all(parm==round(parm)) && all(is.finite(parm)) && all(abs(parm)<=length(object$parameters)) && (all(parm>0) || all(parm<0))
-    if (!valid_numeric){stop("For `parm` a numeric vector of parameter indices, the entries must be integers of size less than or equal to the number of elements in `object$parameters`.")}
+    if (!valid_numeric){stop("Numeric `parm` must contain non-zero integer indices, either all positive or all negative, whose absolute values are no greater than the number of parameters. Alternatively `parm` may be `NULL`, in which case all parameters will be included, or a character vector of parameter names.")}
     parm <- object$parameters[parm]
   }
   if (length(parm)==0){stop("No parameters were selected by `parm`.")}
