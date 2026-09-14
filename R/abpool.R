@@ -94,6 +94,7 @@ abpool <- function(object, parameters = NULL, dfcom = NULL, J = 1) {
     variances <- lapply(variances_all, function(x) x[parameters,parameters,drop = FALSE])
   } else if (length(parameters) == 1){ # Scalar case
     estimates <- sapply(estimates_all, function(x) x[parameters])
+    names(estimates) <- NULL
     variances <- sapply(variances_all, function(x) x[parameters,parameters,drop = TRUE])
   }
   # iii) Get dfcom-

@@ -598,7 +598,7 @@ lm.J1.scalar <- abpool(fits.lin.mice, dfcom=Inf, parameters = "X", J=1)
 lm.J2.scalar <- abpool(fits.lin.mice, dfcom=Inf, parameters = "X", J=2)
 lm.J1.multi <- abpool(fits.lin.mice, dfcom=Inf, J=1)
 lm.J2.multi <- abpool(fits.lin.mice, dfcom=Inf, J=2)
-test_that("samples have correct dimensions", {
+test_that("samples have correct dimensions, type, names", {
   # Length/dimensions
   expect_length(lm.J1.scalar$samples,lm.J1.scalar$m*lm.J1.scalar$J) # Scalar, J = 1
   expect_length(lm.J2.scalar$samples,lm.J2.scalar$m*lm.J2.scalar$J) # Scalar, J > 1
@@ -609,11 +609,23 @@ test_that("samples have correct dimensions", {
   # type
   expect_true(is.numeric(lm.J1.scalar$samples)) # Scalar, J = 1
   expect_true(is.numeric(lm.J2.scalar$samples)) # Scalar, J > 1
-  expect_true(is.numeric(lm.J1.multi$samples)) # Scalar, J = 1
-  expect_true(is.numeric(lm.J2.multi$samples)) # Scalar, J > 1
-  expect_true(is.matrix(lm.J1.multi$samples)) # Scalar, J = 1
-  expect_true(is.matrix(lm.J2.multi$samples)) # Scalar, J > 1
+  expect_true(is.numeric(lm.J1.multi$samples)) # Multi, J = 1
+  expect_true(is.numeric(lm.J2.multi$samples)) # Multi, J > 1
+  expect_true(is.matrix(lm.J1.multi$samples)) # Multi, J = 1
+  expect_true(is.matrix(lm.J2.multi$samples)) # Multi, J > 1
   # names
   expect_equal(colnames(lm.J1.multi$samples),lm.J1.multi$parameters) # Multi, J = 1
   expect_equal(colnames(lm.J2.multi$samples),lm.J2.multi$parameters) # Multi, J > 1
+})
+test_that("estimates have correct dimensions, type, names", {
+  # Length/dimensions
+  expect_length(lm.J1.scalar$estimates,lm.J1.scalar$m) # Scalar
+  expect_equal(length(lm.J1.multi$estimates),lm.J1.multi$m) # Multi
+  expect_equal(length(lm.J1.multi$estimates[[1]]),length(lm.J1.multi$parameters)) # Multi
+  # type
+  expect_true(is.numeric(lm.J1.scalar$estimates)) # Scalar
+  expect_true(is.numeric(lm.J1.multi$estimates[[1]])) # Multi
+  expect_true(is.list(lm.J1.multi$estimates)) # Multi
+  # names
+  expect_equal(names(lm.J1.multi$estimates[[1]]),lm.J1.multi$parameters) # Multi
 })
