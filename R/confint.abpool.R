@@ -28,10 +28,11 @@ confint.abpool <- function(object, parm = NULL, level = 0.95, ...) {
   # parm - change to character vector
   if (is.null(parm)){parm <- object$parameters}
   if (is.numeric(parm)){
-    valid_numeric <- all(parm==round(parm)) && all(is.finite(parm)) && all(abs(parm)<=length(object$parameters)) && (all(parm>=0) || all(parm<=0))
+    valid_numeric <- all(parm==round(parm)) && all(is.finite(parm)) && all(abs(parm)<=length(object$parameters)) && (all(parm>0) || all(parm<0))
     if (!valid_numeric){stop("For `parm` a numeric vector of parameter indices, the entries must be integers of size less than or equal to the number of elements in `object$parameters`.")}
     parm <- object$parameters[parm]
   }
+  if (length(parm)==0){stop("No parameters were selected by `parm`.")}
   if (!all(parm %in% object$parameters)){stop("For `parm` a character vector of parameter names, every element of `parm` must also be an element of `object$parameters`, the parameters in the ABpool sample. Otherwise `parm` may be `NULL`, in which case all parameters will be used, or a numeric vector giving indices of `object$parameters` to output.")}
   # Function
   samples <- object$samples
@@ -39,10 +40,9 @@ confint.abpool <- function(object, parm = NULL, level = 0.95, ...) {
   p_alphas <- c(alpha, 1 - alpha)
   pct <- paste(format(100*p_alphas,trim=TRUE,scientific=FALSE,digits=3),"%")
   if (is.matrix(samples)){
-      ci <- t(apply(samples[,parm, drop = FALSE],2,function(x) quantile(x,p_alphas)))
-      dimnames(ci) <- list(parm,pct)
-  }
-  else {
+    ci <- t(apply(samples[,parm, drop = FALSE],2,function(x) quantile(x,p_alphas)))
+    dimnames(ci) <- list(parm,pct)
+  } else {
     ci <- matrix(quantile(samples,p_alphas), 1,2,dimnames = list(parm,pct))
   }
   ci
