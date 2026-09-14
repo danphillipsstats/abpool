@@ -34,7 +34,7 @@ event[which(Y>100)] <- 0 # Administratively censor at 100
 Y[event==0] <- 100
 X[1:50] <- NA
 data.cox <- data.frame(Y=Y,X=X,X_square=X^2,Z=Z,event=event)
-data.cox$cumhaz <- nelsonaalen(data.cox,timevar=Y,statusvar=event)
+data.cox$cumhaz <- mice::nelsonaalen(data.cox,timevar=Y,statusvar=event)
 pred <- mice::make.predictorMatrix(data.cox)
 pred[, "Y"] <- 0 # do not predict using Y
 meth <- make.method(data.cox)
@@ -70,7 +70,9 @@ Y <- 1 + 2 * rep(X, each = n_rep) + rep(u, each = n_rep) +
   rnorm(n_id * n_rep)
 X[1:30] <- NA
 data.lmer <- data.frame(id = id, X = rep(X, each = n_rep), Y = Y)
-impute.mice <- mice(data.lmer, m = 200, method = "norm", print = FALSE)
+pred <- mice::make.predictorMatrix(data.lmer)
+pred[, "id"] <- 0
+impute.mice <- mice(data.lmer, m = 200, predictorMatrix = pred, print = FALSE)
 fits.lmer.mice <- with(
   impute.mice,
   lmer(Y ~ X + (1 | id))
@@ -517,21 +519,21 @@ test_that("model for which coef/vcov fails", {
   )
 })
 test_that("model with undefined estimates", {
-  # lmer doesn't work for coef
   expect_error(
-    abpool(fits.lin.mice.est.error, dfcom=Inf)
+    abpool(fits.lin.mice.est.error, dfcom=Inf),
+    "estimates.*finite values"
   )
 })
 test_that("model with different df for different imputations", {
-  # lmer doesn't work for coef
   expect_error(
-    abpool(fits.lin.mice.df.error)
+    abpool(fits.lin.mice.df.error),
+    "dfcom.*vary between imputations"
   )
 })
 test_that("model with different order of parameters", {
-  # lmer doesn't work for coef
   expect_error(
-    abpool(fits.lin.order.error)
+    abpool(fits.lin.order.error),
+    "names.*inconsistent across imputations"
   )
 })
 ################################################################################
@@ -661,6 +663,7 @@ test_that("dfcom matches input", {
 test_that("Validate parameters output", {
   expect_equal(abpool(fits.lin.mice)$parameters, names(coef(fits.lin.mice$analyses[[1]]))) # Unspecified
   expect_equal(abpool(fits.lin.mice, parameters = 2)$parameters, names(coef(fits.lin.mice$analyses[[1]]))[2]) # numeric
+  expect_equal(abpool(fits.lin.mice, parameters = c(2,1))$parameters, names(coef(fits.lin.mice$analyses[[1]]))[c(2,1)]) # reordered
   expect_equal(abpool(fits.lin.mice, parameters = "X")$parameters, "X") # character
 })
 #####
