@@ -109,6 +109,12 @@ abpool <- function(object, parameters = NULL, dfcom = NULL, J = 1) {
   #####
   # 3. Sample ABpool
   samples <- abpool_sample(estimates, variances, dfcom, J)
+
+  # Turn parameters into character name
+  if(is.numeric(parameters)){
+    parameters <- coefnames[[1]][parameters]
+  }
+
   # 4. Output
   structure(
     list(
@@ -117,6 +123,7 @@ abpool <- function(object, parameters = NULL, dfcom = NULL, J = 1) {
       variances = variances,
       dfcom = dfcom,
       J = J,
+      m = m,
       parameters = parameters
     ),
     class = "abpool"

@@ -534,17 +534,45 @@ test_that("model with different order of parameters", {
     abpool(fits.lin.order.error)
   )
 })
+################################################################################
+# Test outputs
 #####
 # list and mice version coincide
 test_that("results from mira and list coincide", {
   # Linear regression
+  # Scalar
+  # dfcom = Inf, J = 1
+  set.seed(1)
+  lm.mira <- abpool(fits.lin.mice, parameters = "X", dfcom=Inf)
+  set.seed(1)
+  lm.list <- abpool(fits.lin.mice$analyses, parameters = "X", dfcom=Inf)
+  expect_equal(lm.mira,lm.list)
+  # dfcom = Inf, J = 2
+  set.seed(1)
+  lm.mira <- abpool(fits.lin.mice, parameters = "X", dfcom=Inf, J =2)
+  set.seed(1)
+  lm.list <- abpool(fits.lin.mice$analyses, parameters = "X", dfcom=Inf, J =2)
+  expect_equal(lm.mira,lm.list)
+  # dfcom = Inf, J = 1
+  set.seed(1)
+  lm.mira <- abpool(fits.lin.mice, parameters = "X", dfcom=6)
+  set.seed(1)
+  lm.list <- abpool(fits.lin.mice$analyses, parameters = "X", dfcom=6)
+  expect_equal(lm.mira,lm.list)
+  # dfcom = 6, J = 2
+  set.seed(1)
+  lm.mira <- abpool(fits.lin.mice, parameters = "X", dfcom=6, J =2)
+  set.seed(1)
+  lm.list <- abpool(fits.lin.mice$analyses, parameters = "X", dfcom=6, J =2)
+  expect_equal(lm.mira,lm.list)
+  # multivariate
   # dfcom = Inf, J = 1
   set.seed(1)
   lm.mira <- abpool(fits.lin.mice, dfcom=Inf)
   set.seed(1)
   lm.list <- abpool(fits.lin.mice$analyses, dfcom=Inf)
   expect_equal(lm.mira,lm.list)
-  # dfcom = Inf, J = 1
+  # dfcom = Inf, J = 2
   set.seed(1)
   lm.mira <- abpool(fits.lin.mice, dfcom=Inf, J =2)
   set.seed(1)
@@ -556,10 +584,36 @@ test_that("results from mira and list coincide", {
   set.seed(1)
   lm.list <- abpool(fits.lin.mice$analyses, dfcom=6)
   expect_equal(lm.mira,lm.list)
-  # dfcom = 6, J = 1
+  # dfcom = 6, J = 2
   set.seed(1)
   lm.mira <- abpool(fits.lin.mice, dfcom=6, J =2)
   set.seed(1)
   lm.list <- abpool(fits.lin.mice$analyses, dfcom=6, J =2)
   expect_equal(lm.mira,lm.list)
+})
+#####
+# Samples
+# Length
+lm.J1.scalar <- abpool(fits.lin.mice, dfcom=Inf, parameters = "X", J=1)
+lm.J2.scalar <- abpool(fits.lin.mice, dfcom=Inf, parameters = "X", J=2)
+lm.J1.multi <- abpool(fits.lin.mice, dfcom=Inf, J=1)
+lm.J2.multi <- abpool(fits.lin.mice, dfcom=Inf, J=2)
+test_that("samples have correct dimensions", {
+  # Length/dimensions
+  expect_length(lm.J1.scalar$samples,lm.J1.scalar$m*lm.J1.scalar$J) # Scalar, J = 1
+  expect_length(lm.J2.scalar$samples,lm.J2.scalar$m*lm.J2.scalar$J) # Scalar, J > 1
+  expect_equal(dim(lm.J1.multi$samples)[1],lm.J1.multi$m*lm.J1.multi$J) # Multi, J = 1
+  expect_equal(dim(lm.J2.multi$samples)[1],lm.J2.multi$m*lm.J2.multi$J) # Multi, J > 1
+  expect_equal(dim(lm.J1.multi$samples)[2],length(lm.J1.multi$parameters)) # Multi, J = 1
+  expect_equal(dim(lm.J2.multi$samples)[2],length(lm.J2.multi$parameters)) # Multi, J > 1
+  # type
+  expect_true(is.numeric(lm.J1.scalar$samples)) # Scalar, J = 1
+  expect_true(is.numeric(lm.J2.scalar$samples)) # Scalar, J > 1
+  expect_true(is.numeric(lm.J1.multi$samples)) # Scalar, J = 1
+  expect_true(is.numeric(lm.J2.multi$samples)) # Scalar, J > 1
+  expect_true(is.matrix(lm.J1.multi$samples)) # Scalar, J = 1
+  expect_true(is.matrix(lm.J2.multi$samples)) # Scalar, J > 1
+  # names
+  expect_equal(colnames(lm.J1.multi$samples),lm.J1.multi$parameters) # Multi, J = 1
+  expect_equal(colnames(lm.J2.multi$samples),lm.J2.multi$parameters) # Multi, J > 1
 })

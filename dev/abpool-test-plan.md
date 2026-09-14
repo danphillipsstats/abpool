@@ -36,9 +36,10 @@ SAMPLING
 [-] abpool(mira_object,) = abpool(mira_object$analyses) (tested just for lm())
 
 OUTPUT
-[ ] samples (scalar/multivariate) - length, type, dimension, names
+[-] samples (scalar/multivariate/J=1/J>1) - length/dimension, type, names
 [ ] estimates (scalar/multivariate) - length, type, dimension, names
 [ ] variance (scalar/multivariate) - length, type, dimension, names
+[ ] m matches input length
 [ ] J matches input
 [ ] dfcom matches input
 [ ] dfcom extracted
