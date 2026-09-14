@@ -33,7 +33,7 @@ Invalid
 [-] Different order of parameters across elements
 
 SAMPLING
-[ ] abpool(mira_object,) = abpool(mira_object$analyses)
+[-] abpool(mira_object,) = abpool(mira_object$analyses) (tested just for lm())
 
 OUTPUT
 [ ] samples (scalar/multivariate) - length, type, dimension, names

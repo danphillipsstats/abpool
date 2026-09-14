@@ -314,29 +314,29 @@ test_that("df accepts valid inputs", {
   # Linear regression
   # mira object
   expect_no_error(
-    abpool(fits.lin.mice, dfcom=19)
+    abpool(fits.lin.mice, dfcom=6)
   )
   # list object
   expect_no_error(
-    abpool(fits.lin.mice$analyses, dfcom=19)
+    abpool(fits.lin.mice$analyses, dfcom=6)
   )
   # Logistic regression
   # mira object
   expect_no_error(
-    abpool(fits.log.mice, dfcom=19)
+    abpool(fits.log.mice, dfcom=6)
   )
   # list object
   expect_no_error(
-    abpool(fits.log.mice$analyses, dfcom=19)
+    abpool(fits.log.mice$analyses, dfcom=6)
   )
   # Cox regression
   # mira object
   expect_no_error(
-    abpool(fits.cox.mice, dfcom=19)
+    abpool(fits.cox.mice, dfcom=6)
   )
   # list object
   expect_no_error(
-    abpool(fits.cox.mice$analyses, dfcom=19)
+    abpool(fits.cox.mice$analyses, dfcom=6)
   )
 })
 test_that("df rejects invalid inputs", {
@@ -357,11 +357,11 @@ test_that("df rejects invalid inputs", {
   )
   # vector
   expect_error(
-    abpool(fits.lin.mice$analyses, dfcom=rep(19,length(fits.lin.mice$analyses)))
+    abpool(fits.lin.mice$analyses, dfcom=rep(6,length(fits.lin.mice$analyses)))
   )
   # list
   expect_error(
-    abpool(fits.lin.mice$analyses, dfcom=as.list(rep(19,length(fits.lin.mice$analyses))))
+    abpool(fits.lin.mice$analyses, dfcom=as.list(rep(6,length(fits.lin.mice$analyses))))
   )
 })
 test_that("df extracts correctly where available", {
@@ -533,4 +533,33 @@ test_that("model with different order of parameters", {
   expect_error(
     abpool(fits.lin.order.error)
   )
+})
+#####
+# list and mice version coincide
+test_that("results from mira and list coincide", {
+  # Linear regression
+  # dfcom = Inf, J = 1
+  set.seed(1)
+  lm.mira <- abpool(fits.lin.mice, dfcom=Inf)
+  set.seed(1)
+  lm.list <- abpool(fits.lin.mice$analyses, dfcom=Inf)
+  expect_equal(lm.mira,lm.list)
+  # dfcom = Inf, J = 1
+  set.seed(1)
+  lm.mira <- abpool(fits.lin.mice, dfcom=Inf, J =2)
+  set.seed(1)
+  lm.list <- abpool(fits.lin.mice$analyses, dfcom=Inf, J =2)
+  expect_equal(lm.mira,lm.list)
+  # dfcom = Inf, J = 1
+  set.seed(1)
+  lm.mira <- abpool(fits.lin.mice, dfcom=6)
+  set.seed(1)
+  lm.list <- abpool(fits.lin.mice$analyses, dfcom=6)
+  expect_equal(lm.mira,lm.list)
+  # dfcom = 6, J = 1
+  set.seed(1)
+  lm.mira <- abpool(fits.lin.mice, dfcom=6, J =2)
+  set.seed(1)
+  lm.list <- abpool(fits.lin.mice$analyses, dfcom=6, J =2)
+  expect_equal(lm.mira,lm.list)
 })
