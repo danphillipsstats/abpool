@@ -37,8 +37,8 @@ SAMPLING
 
 OUTPUT
 [-] samples (scalar/multivariate/J=1/J>1) - length/dimension, type, names
-[-] estimates (scalar/multivariate) - length, type, dimension, names
-[ ] variance (scalar/multivariate) - length, type, dimension, names
+[-] estimates (scalar/multivariate) - length/dimension, type, names
+[-] variance (scalar/multivariate) - length/dimension, type, names
 [ ] m matches input length
 [ ] J matches input
 [ ] dfcom matches input

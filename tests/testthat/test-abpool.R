@@ -629,3 +629,18 @@ test_that("estimates have correct dimensions, type, names", {
   # names
   expect_equal(names(lm.J1.multi$estimates[[1]]),lm.J1.multi$parameters) # Multi
 })
+test_that("variances have correct dimensions, type, names", {
+  # Length/dimensions
+  expect_length(lm.J1.scalar$variances,lm.J1.scalar$m) # Scalar
+  expect_equal(length(lm.J1.multi$variances),lm.J1.multi$m) # Multi
+  expect_equal(dim(lm.J1.multi$variances[[1]])[1],length(lm.J1.multi$parameters)) # Multi
+  expect_equal(dim(lm.J1.multi$variances[[1]])[2],length(lm.J1.multi$parameters)) # Multi
+  # type
+  expect_true(is.numeric(lm.J1.scalar$variances)) # Scalar
+  expect_true(is.numeric(lm.J1.multi$variances[[1]])) # Multi
+  expect_true(is.matrix(lm.J1.multi$variances[[1]])) # Multi
+  expect_true(is.list(lm.J1.multi$variances)) # Multi
+  # names
+  expect_equal(colnames(lm.J1.multi$variances[[1]]),lm.J1.multi$parameters) # Multi
+  expect_equal(rownames(lm.J1.multi$variances[[1]]),lm.J1.multi$parameters) # Multi
+})
