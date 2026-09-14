@@ -44,4 +44,4 @@ OUTPUT
 [-] dfcom output correct (matches input/extracted matches df.residual)
 [-] parameters matches input
 [-] parameters = NULL actually selects all parameters (validate with names from samples, estimates, variances)
-[ ] parameters reordered does it for estimates and variances correctly
+[-] parameters reordered does it for estimates and variances correctly

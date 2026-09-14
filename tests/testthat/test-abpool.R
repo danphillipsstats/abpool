@@ -663,3 +663,9 @@ test_that("Validate parameters output", {
   expect_equal(abpool(fits.lin.mice, parameters = 2)$parameters, names(coef(fits.lin.mice$analyses[[1]]))[2]) # numeric
   expect_equal(abpool(fits.lin.mice, parameters = "X")$parameters, "X") # character
 })
+#####
+# Checking parameters reorder correctly
+test_that("Check parameters reorder correctly", {
+  expect_equal(abpool(fits.lin.mice, parameters = c(2,1))$estimates[[1]], coef(fits.lin.mice$analyses[[1]])[c(2,1)]) # numeric
+  expect_equal(abpool(fits.lin.mice, parameters = c(2,1))$variances[[1]], vcov(fits.lin.mice$analyses[[1]])[c(2,1),c(2,1)]) # numeric
+})
