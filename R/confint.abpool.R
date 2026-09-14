@@ -22,14 +22,14 @@
 confint.abpool <- function(object, parm = NULL, level = 0.95, ...) {
   # Validation
   # level
-  if (length(level) != 1L || level <= 0 || level >= 1) {
+  if (length(level) != 1L || !is.numeric(level) || level <= 0 || level >= 1) {
     stop("`level` must be a single numeric value between 0 and 1.")
   }
   # parm - change to character vector
   if (is.null(parm)){parm <- object$parameters}
   if (is.numeric(parm)){
-    valid_numeric <- all(parm==round(parm)) && all(parm > 0) && all(is.finite(parm)) && all(parm<=length(object$parameters))
-    if (!valid_numeric){stop("For `parm` a numeric vector of parameter indices, the entries must be positive integers, of size less than or equal to the number of elements in `object$parameters`.")}
+    valid_numeric <- all(parm==round(parm)) && all(is.finite(parm)) && all(abs(parm)<=length(object$parameters)) && (all(parm>=0) || all(parm<=0))
+    if (!valid_numeric){stop("For `parm` a numeric vector of parameter indices, the entries must be integers of size less than or equal to the number of elements in `object$parameters`.")}
     parm <- object$parameters[parm]
   }
   if (!all(parm %in% object$parameters)){stop("For `parm` a character vector of parameter names, every element of `parm` must also be an element of `object$parameters`, the parameters in the ABpool sample. Otherwise `parm` may be `NULL`, in which case all parameters will be used, or a numeric vector giving indices of `object$parameters` to output.")}
