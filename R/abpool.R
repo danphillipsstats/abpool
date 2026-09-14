@@ -2,37 +2,37 @@
 #'
 #' Perform approximate Bayesian pooling (ABpool).
 #'
-#' Given a list of model fits to each imputed dataset, pool the estimates via approximate Bayesian pooling (ABpool).
-#' The function first extracts estimates and variances for the parameters from each fitted model. It then generates ABpool posterior samples from a t-distribution with location given by the estimates, and squared scale given by the variances. For `dfcom = Inf`, draws are from the corresponding Gaussian distribution.
+#' Given model fits from multiply imputed datasets, `abpool()` generates posterior samples using approximate Bayesian pooling (ABpool).
+#' The function first extracts estimates and variances for the parameters from each fitted model. It then generates ABpool posterior samples from a t-distribution with location given by the estimates, and squared scale (or scale matrix) given by the variances. For `dfcom = Inf`, draws are from the corresponding Gaussian distribution.
 #'
 #' @param object A list of model fits, where the `l`th element gives the model fit to the `l`th imputed dataset. Can be a `mira` object created by `mice::with()`
-#' @param parameters A character vector of parameter names, or a numeric vector of parameter positions for which to perform ABpool. If `parameters = NULL`, ABpool will be performed for all parameters in the model. Where relevant, the order of parameters supplied by the user will be retained.
-#' @param dfcom Complete-data degrees of freedom; the degrees of freedom for the t-distributed completed-data posterior approximation. We recommend the user to specify `dfcom` where appropriate. If `dfcom = Inf`, samples are drawn from the equivalent Gaussian distribution. If `dfcom = NULL`, the estimated degrees of freedom will be extracted from the fitted models, where possible.
-#' @param J Number of samples per imputation. Default `J = 1` sample per imputed dataset.
+#' @param parameters A character vector of parameter names, or a numeric vector of parameter positions to include in ABpool. If `parameters = NULL`, ABpool will be performed for all parameters in the model. Parameter samples are returned in the order specified.
+#' @param dfcom The complete-data degrees of freedom used for the t-distributed complete-data posterior approximation. `dfcom = Inf` corresponds to a Gaussian approximation. If `NULL`, `abpool()` attempts to extract the degrees of freedom from each fitted model using `df.residual()`; an error is returned if extraction fails or the extracted values differ across imputations. We recommend specifying `dfcom` when the appropriate complete-data degrees of freedom are known.
+#' @param J Number of samples drawn per imputed dataset. Defaults to `1`.
 #'
 #' @details
-#' The `abpool` function samples from an approximation to the observed-data posterior distribution, assuming the completed-data posterior distribution given each imputed dataset is t-distributed, with degrees of freedom equal to `dfcom`, location given by the estimate, and squared scale given by the variance estimate.
+#' The `abpool` function samples from an approximation to the observed-data posterior distribution, assuming the completed-data posterior distribution given each imputed dataset is t-distributed, with degrees of freedom equal to `dfcom`, location given by the estimate, and squared scale (or scale matrix) given by the variance estimate.
 #' The input `object` may be:
 #' 1. A list of model fit objects, with each element generated from a function such as `lm()`, `glm()`, `coxph()` etc.
-#' 2. An object of class `mira` generated from `mice::with()`, from the `mice` package.
+#' 2. An object of class `mira` generated from `with()`, on a `mids` object from the `mice` package. (Missing data can be imputed by `pool()` which generates a `mids` object. `with()` performs repeated analyses on the imputed data and generates a `mira` object.)
 #'
-#' Note the required number of imputations to fit ABpool is much larger than for Rubin's rules. We recommend 1000 or more imputations may be required for inference via ABpool to give appropriate coverage (Phillips, Christodoulou and Steinsaltz, XXXX). We recommend 200 or more imputations to compare the distribution of Rubin's rules to ABpool samples in a Q--Q plot. This can be done via the function `QQ_compare_abpool_rubin()`.
+#' Inference using ABpool generally requires substantially more imputations than Rubin's rules. We recommend using at least 200 imputations when comparing Rubin's rules with ABpool using a Q--Q plot (`QQ_compare_abpool_rubin()`), and 1000 or more imputations may be required for final inference using ABpool to achieve appropriate coverage (Phillips, Christodoulou and Steinsaltz, XXXX).
 #'
 #' @return An object of class `abpool`. The object is a list containing
 #' \describe{
-#'   \item{samples}{Samples from approximate Bayesian pooling. Samples from approximate Bayesian pooling. These will either be a vector of length `m x J` for a single parameter, or an `m x J` by `p` matrix for multiple parameters.}
-#'   \item{estimates}{Estimates for each imputed dataset. Either a vector of length `m` (scalar case), or a list of length `m`, with each entry a vector of length `p` (multivariate case).}
-#'   \item{variances}{Associated variances or variance-covariance matrices for each imputed dataset. Either a vector of length `m` (scalar case), or a list of length `m`, with each entry a `p` by `p` matrix (multivariate case).}
+#'   \item{samples}{ABpool posterior samples. A numeric vector of length `m x J` for a single parameter, or an `m * J` by `p` matrix for `p` parameters.}
+#'   \item{estimates}{Parameter estimates extracted from the fitted models. A numeric vector of length `m` for a single parameter, or a list of `m` numeric vectors of length `p` for multiple parameters.}
+#'   \item{variances}{Variance estimates extracted from the fitted models. A numeric vector of length `m` for a single parameter, or a list of `m` covariance matrices of dimension `p` by `p` for multiple parameters.}
 #'   \item{dfcom}{The complete-data degrees of freedom used for sampling.}
-#'   \item{parameters}{The names of the parameters for which the ABpool samples were drawn, in the order used for sampling.}
+#'   \item{parameters}{A character vector containing the names of the parameters included in ABpool, in the order used for sampling.}
 #'   \item{J}{The number of samples drawn per imputed dataset.}
 #'   \item{m}{The number of imputed datasets.}
-#'   \item{imputation}{A vector giving the imputation from which the corresponding element/row of the ABpool samples were drawn. If `return$imputation[i] = l` then `return$samples[i]` (scalar case) or `return$samples[i,]` (multi-parameter case) was drawn from the `l`th imputation.}
+#'   \item{imputation}{An integer vector of length `m * J` identifying the imputed dataset associated with each element (scalar case) or row (multivariate case) of `samples`.}
 #' }
 #'
 #' @references Phillips, Christodoulou and Steinsaltz (XXXX)
 #'
-#' @seealso [abpool_sample()] to sample from a vector/list of estimates and variances, [with()] to generate a `mira` object containing a list of model fits, [mice::mice()] to impute missing data, the output of which can be used as an input for [with()] to generate the `mira` object.
+#' @seealso [QQ_compare_abpool_rubin()] to compare Rubin's rules and ABpool in a quantile-quantile (Q--Q) plot, [abpool_sample()] to sample from a vector/list of estimates and variances, [mice::with.mids()] to generate a `mira` object containing a list of model fits, [mice::mice()] to impute missing data, the output of which can be used as an input for [with()] to generate the `mira` object.
 #'
 #' @examples
 #'
