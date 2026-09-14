@@ -80,6 +80,10 @@ The variances for each imputed dataset
 The complete-data degrees of freedom
  - results$J
 The number of samples per imputation
+ - results$m
+The number of imputed datasets
+ - results$parameters
+The names of the parameters for which ABpool was applied
 
 ## 5. Function overview
  - Test inputs
@@ -104,8 +108,7 @@ The function should give an informative error if:
 - Parameter dimensions are inconsistent across imputations.
 
 ## 7. Warnings
- - Possibly warn if `dfcom` is small?
-
+None.
 Context on dfcom: The mean exists if dfcom > 1, the variance exists if dfcom > 2, skewness if dfcom > 3 and kurtosis if dfcom > 4. dfcom = Inf corresponds to generating from a Gaussian.
 We will require dfcom > 0, and may give a warning if dfcom < 4.
 

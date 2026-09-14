@@ -6,12 +6,12 @@
 #' The function first extracts estimates and variances for the parameters from each fitted model. It then generates ABpool posterior samples from a t-distribution with location given by the estimates, and squared scale given by the variances. For `dfcom = Inf`, draws are from the corresponding Gaussian distribution.
 #'
 #' @param object A list of model fits, where the `l`th element gives the model fit to the `l`th imputed dataset. Can be a `mira` object created by `mice::with()`
-#' @param parameters The names of the parameters for which to perform ABpool. If `parameters = NULL`, ABpool will be performed for all parameters in the model.
+#' @param parameters A character vector of parameter names, or a numeric vector of parameter positions for which to perform ABpool. If `parameters = NULL`, ABpool will be performed for all parameters in the model. Where relevant, the order of parameters supplied by the user will be retained.
 #' @param dfcom Complete-data degrees of freedom; the degrees of freedom for the t-distributed completed-data posterior approximation. We recommend the user to specify `dfcom` where appropriate. If `dfcom = Inf`, samples are drawn from the equivalent Gaussian distribution. If `dfcom = NULL`, the estimated degrees of freedom will be extracted from the fitted models, where possible.
 #' @param J Number of samples per imputation. Default `J = 1` sample per imputed dataset.
 #'
 #' @details
-#' The `abpool` function samples from an approximation to the observed-data posterior distribution, assuming the completed-data posterior distribution given each imputation is t-distributed, with degrees of freedom equal to the corresponding complete-data degrees of freedom for the analysis, location given by the estimate, and squared scale given by the variance estimate.
+#' The `abpool` function samples from an approximation to the observed-data posterior distribution, assuming the completed-data posterior distribution given each imputed dataset is t-distributed, with degrees of freedom equal to `dfcom`, location given by the estimate, and squared scale given by the variance estimate.
 #' The input `object` may be:
 #' 1. A list of model fit objects, with each element generated from a function such as `lm()`, `glm()`, `coxph()` etc.
 #' 2. An object of class `mira` generated from `mice::with()`, from the `mice` package.
@@ -20,17 +20,18 @@
 #'
 #' @return An object of class `abpool`. The object is a list containing
 #' \describe{
-#'   \item{samples}{Samples from approximate Bayesian pooling. These will either be a vector of length `m`, where just one parameter is sampled from, or an `m x p` matrix, where `p` parameters are sampled from, for `m` the number of imputations.}
+#'   \item{samples}{Samples from approximate Bayesian pooling. Samples from approximate Bayesian pooling. These will either be a vector of length `m x J` for a single parameter, or an `m x J` by `p` matrix for multiple parameters. Samples `1:J` are drawn from the first completed-data posterior approximation, etc. with samples `(l-1)+(1:J)` being from the posterior approximation for the `l`th imputation, for `l` in `1` to `m`.}
 #'   \item{estimates}{Estimates for each imputed dataset. Either a vector of length `m` (scalar case), or a list of length `m`, with each entry a vector of length `p` (multivariate case).}
-#'   \item{variances}{Associated variances or variance-covariance matrices for each imputed dataset. Either a vector of length `m` (scalar case), or a list of length `m`, with each entry a `p x p` matrix (multivariate case).}
+#'   \item{variances}{Associated variances or variance-covariance matrices for each imputed dataset. Either a vector of length `m` (scalar case), or a list of length `m`, with each entry a `p` by `p` matrix (multivariate case).}
 #'   \item{dfcom}{The complete-data degrees of freedom used for sampling.}
 #'   \item{J}{The number of samples drawn per imputed dataset.}
-#'   \item{parameters}{The parameters for which the ABpool samples were drawn.}
+#'   \item{m}{The number of imputed datasets.}
+#'   \item{parameters}{The names of the parameters for which the ABpool samples were drawn, in the order used for sampling.}
 #' }
 #'
 #' @references Phillips, Christodoulou and Steinsaltz (XXXX)
 #'
-#' @seealso [abpool_sample()] to sample from a vector/list of estimates and variances, [mice::with()] to generate a `mira` object containing a list of model fits
+#' @seealso [abpool_sample()] to sample from a vector/list of estimates and variances, [with()] to generate a `mira` object containing a list of model fits, [mice::mice()] to impute missing data, the output of which can be used as an input for [with()] to generate the `mira` object.
 #'
 #' @examples
 #'
