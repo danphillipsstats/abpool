@@ -39,10 +39,9 @@ OUTPUT
 [-] samples (scalar/multivariate/J=1/J>1) - length/dimension, type, names
 [-] estimates (scalar/multivariate) - length/dimension, type, names
 [-] variance (scalar/multivariate) - length/dimension, type, names
-[ ] m matches input length
-[ ] J matches input
-[ ] dfcom matches input
-[ ] dfcom extracted
-[ ] parameters matches input
-[ ] parameters = NULL actually selects all parameters (validate with names from samples, estimates, variances)
+[-] m matches input length
+[-] J matches input
+[-] dfcom output correct (matches input/extracted matches df.residual)
+[-] parameters matches input
+[-] parameters = NULL actually selects all parameters (validate with names from samples, estimates, variances)
 [ ] parameters reordered does it for estimates and variances correctly

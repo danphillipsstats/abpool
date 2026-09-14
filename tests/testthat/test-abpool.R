@@ -592,12 +592,12 @@ test_that("results from mira and list coincide", {
   expect_equal(lm.mira,lm.list)
 })
 #####
-# Samples
-# Length
+# Validate outputs (length/dimension, type, names)
 lm.J1.scalar <- abpool(fits.lin.mice, dfcom=Inf, parameters = "X", J=1)
 lm.J2.scalar <- abpool(fits.lin.mice, dfcom=Inf, parameters = "X", J=2)
 lm.J1.multi <- abpool(fits.lin.mice, dfcom=Inf, J=1)
 lm.J2.multi <- abpool(fits.lin.mice, dfcom=Inf, J=2)
+# Samples
 test_that("samples have correct dimensions, type, names", {
   # Length/dimensions
   expect_length(lm.J1.scalar$samples,lm.J1.scalar$m*lm.J1.scalar$J) # Scalar, J = 1
@@ -643,4 +643,23 @@ test_that("variances have correct dimensions, type, names", {
   # names
   expect_equal(colnames(lm.J1.multi$variances[[1]]),lm.J1.multi$parameters) # Multi
   expect_equal(rownames(lm.J1.multi$variances[[1]]),lm.J1.multi$parameters) # Multi
+})
+test_that("m output is correct", {
+  expect_equal(abpool(fits.lin.mice)$m,length(fits.lin.mice$analyses))
+  expect_equal(abpool(fits.lin.mice$analyses)$m,length(fits.lin.mice$analyses))
+})
+test_that("J matches input", {
+  expect_equal(abpool(fits.lin.mice)$J, 1) # Unspecified gives J = 1
+  expect_equal(abpool(fits.lin.mice, J = 2)$J, 2)
+})
+test_that("dfcom matches input", {
+  expect_equal(abpool(fits.lin.mice)$dfcom, df.residual(fits.lin.mice$analyses[[1]])) # Unspecified calculated by df.residual
+  expect_equal(abpool(fits.log.mice)$dfcom, df.residual(fits.log.mice$analyses[[1]])) # Unspecified calculated by df.residual
+  expect_equal(abpool(fits.lin.mice, dfcom = 2)$dfcom, 2)
+  expect_equal(abpool(fits.lin.mice, dfcom = Inf)$dfcom, Inf)
+})
+test_that("Validate parameters output", {
+  expect_equal(abpool(fits.lin.mice)$parameters, names(coef(fits.lin.mice$analyses[[1]]))) # Unspecified
+  expect_equal(abpool(fits.lin.mice, parameters = 2)$parameters, names(coef(fits.lin.mice$analyses[[1]]))[2]) # numeric
+  expect_equal(abpool(fits.lin.mice, parameters = "X")$parameters, "X") # character
 })
