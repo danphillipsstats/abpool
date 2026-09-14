@@ -666,6 +666,12 @@ test_that("Validate parameters output", {
   expect_equal(abpool(fits.lin.mice, parameters = c(2,1))$parameters, names(coef(fits.lin.mice$analyses[[1]]))[c(2,1)]) # reordered
   expect_equal(abpool(fits.lin.mice, parameters = "X")$parameters, "X") # character
 })
+test_that("J matches input", {
+  expect_equal(lm.J1.scalar$imputation, 1:lm.J1.scalar$m) # J = 1
+  expect_equal(lm.J2.scalar$imputation, rep(1:lm.J2.scalar$m,each=lm.J2.scalar$J))
+  expect_equal(lm.J1.multi$imputation, 1:lm.J1.multi$m) # J = 1
+  expect_equal(lm.J2.multi$imputation, rep(1:lm.J2.multi$m,each=lm.J2.multi$J))
+})
 #####
 # Checking parameters reorder correctly
 test_that("Check parameters reorder correctly", {

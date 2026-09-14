@@ -124,9 +124,10 @@ abpool <- function(object, parameters = NULL, dfcom = NULL, J = 1) {
       estimates = estimates,
       variances = variances,
       dfcom = dfcom,
+      parameters = parameters,
+      imputation = rep(seq_len(m), each = J),
       J = J,
-      m = m,
-      parameters = parameters
+      m = m
     ),
     class = "abpool"
   )
