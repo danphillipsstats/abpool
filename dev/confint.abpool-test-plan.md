@@ -10,9 +10,9 @@ Inputs
 [-] level invalid (>1, <0, vector, character)
 
 OUTPUT
-[ ] one parameter - length/dimension, type, names
-[ ] multi parameter - length/dimension, type, names
-[ ] one parameter - correctly applies quantile
-[ ] multi parameter - correctly applies quantile
-[ ] negative parm chooses correct parameters
-[ ] positive parm chooses correct parameters
+[-] one parameter - length/dimension, type, names
+[-] multi parameter - length/dimension, type, names
+[-] one parameter - correctly applies quantile
+[-] multi parameter - correctly applies quantile
+[-] negative parm chooses correct parameters
+[-] positive parm chooses correct parameters
