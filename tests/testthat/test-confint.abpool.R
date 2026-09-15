@@ -143,9 +143,9 @@ test_that("output has correct dimensions, type, names", {
   expect_true(is.numeric(multi.out))
   expect_true(is.numeric(one.out))
   # Dimensions
-  expect_equal(dim(scalar.out),1)
-  expect_equal(dim(multi.out),3)
-  expect_equal(dim(one.out),1)
+  expect_equal(dim(scalar.out)[1],1)
+  expect_equal(dim(multi.out)[1],3)
+  expect_equal(dim(one.out)[1],1)
   expect_equal(dim(scalar.out)[2],2)
   expect_equal(dim(multi.out)[2],2)
   expect_equal(dim(one.out)[2],2)
