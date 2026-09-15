@@ -58,10 +58,10 @@ abpool <- function(object, parameters = NULL, dfcom = NULL, J = 1) {
   if (mice::is.mira(object)){
     fits <- object$analyses
   } else if (is.list(object)) {
-      fits <- object
+    fits <- object
   } else {
-        stop("object must be a list of model fits, where the `l`th element gives the model fit to the `l`th imputed dataset, or a `mira` object created by `mice::with()`")
-      }
+    stop("object must be a list of model fits, where the `l`th element gives the model fit to the `l`th imputed dataset, or a `mira` object created by `mice::with()`")
+  }
   if (length(fits) == 0L){stop("`object` must contain at least one fitted model.")}
   m <- length(fits)
 
@@ -82,10 +82,10 @@ abpool <- function(object, parameters = NULL, dfcom = NULL, J = 1) {
   if (!(all(coefnames[[1]]==colnames[[1]]) && all(coefnames[[1]]==rownames[[1]]))){stop("The names of the coefficients extracted from the entries of `object` by `coef` are inconsistent with those extracted by `vcov`.")}
   # Check `parameters` are parameter entries (if numeric)
   if (is.numeric(parameters) && !all(parameters %in% seq_along(estimates_all[[1]]))){stop("`parameters` must be a character vector of parameter names, a numeric vector of parameter orders, or NULL, in which case all parameters will be used.",
-                                                                               "Where a character vector is supplied, the entries must correspond to the names of the parameters extracted from the model fits by `coef()`")}
+                                                                                          "Where a character vector is supplied, the entries must correspond to the names of the parameters extracted from the model fits by `coef()`")}
   # Check `parameters` are parameter names (if character)
   if (is.character(parameters) && !all(parameters %in% coefnames[[1]])){stop("`parameters` must be a character vector of parameter names, a numeric vector of parameter orders, or NULL, in which case all parameters will be used.",
-                                                                               "Where a character vector is supplied, the entries must correspond to the names of the parameters extracted from the model fits by `coef()`")}
+                                                                             "Where a character vector is supplied, the entries must correspond to the names of the parameters extracted from the model fits by `coef()`")}
   # Choose all parameters (if null)
   if (is.null(parameters)){parameters <- seq_along(estimates_all[[1]])}
 
@@ -102,8 +102,8 @@ abpool <- function(object, parameters = NULL, dfcom = NULL, J = 1) {
   # iii) Get dfcom-
   if (is.null(dfcom)){
     dfcom.vec <- tryCatch(vapply(fits, df.residual, numeric(1)), error = function(e) NULL)
-  if (is.null(dfcom.vec)){stop("Please supply a value of `dfcom`. Usually, an appropriate choice will be one of: Inf, for a Gaussian complete-data posterior approximation; n - p, given sample size n and number of parameters p; or n - n_event, where n_event is the number of events in the Cox model.",
-                               "If `dfcom` is not supplied, the entries in the list `object` must be such that `df.residual()` can be applied to them, to extract `dfcom`.")}
+    if (is.null(dfcom.vec)){stop("Please supply a value of `dfcom`. Usually, an appropriate choice will be one of: Inf, for a Gaussian complete-data posterior approximation; n - p, given sample size n and number of parameters p; or n - n_event, where n_event is the number of events in the Cox model.",
+                                 "If `dfcom` is not supplied, the entries in the list `object` must be such that `df.residual()` can be applied to them, to extract `dfcom`.")}
     if (!all(dfcom.vec==dfcom.vec[1])){stop("Extracted values of `dfcom` via `df.residual()` vary between imputations.")} # This error message could be improved
     # Perhaps update to extract df when not available as n - p and account for Cox model as n - nevent -- see mice::get.dfcom
     dfcom <- dfcom.vec[1]
