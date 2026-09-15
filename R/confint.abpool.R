@@ -1,10 +1,8 @@
 #' Credible intervals for approximate Bayesian pooling
 #'
-#' Calculate credible intervals from approximate Bayesian pooling (ABpool)
-#' posterior samples.
+#' Calculate credible intervals using posterior samples from approximate Bayesian pooling (ABpool) .
 #'
-#' Credible intervals are calculated using empirical quantiles of the
-#' posterior samples returned by [abpool()].
+#' Credible intervals are calculated using empirical quantiles of the posterior samples returned by [abpool()].
 #'
 #' @param object An object of class `abpool`, returned by [abpool()].
 #' @param parm A character or numeric vector specifying the parameters for which credible intervals should be calculated. If `NULL`, intervals are calculated for all parameters.
