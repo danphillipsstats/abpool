@@ -18,11 +18,10 @@
 #' @param plot.it Logical. Should the Q--Q plot be plotted? Defaults to `TRUE`.
 #' @param add_qqline Logical. Should a Q--Q reference line be added?
 #'   Defaults to `TRUE`.
-#' @param conf.level Optional confidence level for a confidence band. The
-#'   default, `NULL`, does not compute a confidence band.
 #' @param ... Additional graphical arguments passed to [qqplot()].
 #'
 #' @return
+#' Invisibly returns the following:
 #' If `parm` specifies a single parameter, a list containing:
 #' \itemize{
 #'   \item{x}{The quantiles of Rubin's \(t\)-approximation at the
@@ -37,10 +36,6 @@
 #'
 #' If multiple parameters are specified, a named list containing one such
 #' list for each parameter is returned.
-#'
-#' If `conf.level` is specified, the corresponding result additionally
-#' contains `lwr` and `upr`, giving the lower and upper limits of the
-#' confidence band.
 #'
 #' @details
 #' For each parameter, Rubin's \(t\)-approximation has location
@@ -77,7 +72,7 @@
 #' # Minimal example to be added.
 #'
 #' @export
-qqplot_rubin_abpool <- function(object, parm = NULL, plot.it = TRUE, add_qqline = TRUE, conf.level = NULL, ...) {
+qqplot_rubin_abpool <- function(object, parm = NULL, plot.it = TRUE, add_qqline = TRUE, ...) {
   # 1. Validate inputs
   # object
   if (!inherits(object,"abpool")){
@@ -97,7 +92,10 @@ qqplot_rubin_abpool <- function(object, parm = NULL, plot.it = TRUE, add_qqline 
   dots <- list(...)
   if (!"xlab" %in% names(dots)) dots$xlab <- "Quantiles from Rubin's t-approximation"
   if (!"ylab" %in% names(dots)) dots$ylab <- "Posterior samples from ABpool"
-  if (!"main" %in% names(dots)) dots$main <- "Q-Q plot comparing Rubin's rules to ABpool"
+  main_supplied <- "main" %in% names(dots)
+  if (!main_supplied) {
+    dots$main <- "Q-Q plot comparing Rubin's rules to ABpool"
+  }
 
   # 2. Extract quantities needed to apply Rubin's rules from `object`
   m <- object$m; dfcom <- object$dfcom; estimates <- object$estimates; variances <- object$variances; samples <- object$samples
@@ -128,8 +126,44 @@ qqplot_rubin_abpool <- function(object, parm = NULL, plot.it = TRUE, add_qqline 
         qqline(y = ordered_samples, distribution = function(p) estimate + qt(p,df) * sqrt(v))
       }
     }
-    return(list(x = q_rubin, y = ordered_samples, p = p))
+    return(invisible(list(x = q_rubin, y = ordered_samples, p = p)))
   } else { # Multivariate case
+    out <- vector("list", length(parm))
+    names(out) <- parm
+    # Number of samples
+    k <- nrow(samples)
+    # Probabilities
+    p <- ppoints(k)
 
+    for (parameter in parm) {
+      # Extract estimates and variances for parameter
+      estimates_parameter <- sapply(estimates, function(x) x[parameter])
+      variances_parameter <- sapply(variances, function(x) x[parameter,parameter])
+      samples_parameter <- samples[,parameter]
+      # Estimate Rubin's rules
+      estimate <- mean(estimates_parameter)
+      ubar <- mean(variances_parameter)
+      b <- var(estimates_parameter)
+      v <- ubar + (1 + 1/m)*b
+      lambda <- (1 + 1/m)*b/v
+      if (dfcom == Inf){
+        df <- (m-1)/lambda^2
+      } else {
+        df_factor <- (1-lambda) * dfcom * (dfcom + 1)
+        df <- (m-1) * df_factor / ((m-1) * (dfcom + 3) + lambda^2 * df_factor)
+      }
+      q_rubin <- estimate + qt(p,df) * sqrt(v)
+      ordered_samples <- samples_parameter[order(samples_parameter)]
+      if (!main_supplied) {dots$main <- paste0("Q-Q plot",": ",parameter)}
+      if (plot.it){
+        do.call(qqplot,c(list(x = q_rubin, y = ordered_samples), dots))
+        if (add_qqline){
+          qqline(y = ordered_samples, distribution = function(p) estimate + qt(p,df) * sqrt(v))
+        }
+      }
+      out[[parameter]] <- list(x = q_rubin, y = ordered_samples, p = p)
+    }
+    if (length(out)==1) out <- out[[1]] # If only one element in parm, return list without parameter sublist.
+    return(invisible(out))
   }
 }

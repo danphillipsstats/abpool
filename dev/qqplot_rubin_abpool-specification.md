@@ -36,12 +36,8 @@ logical. Should a qqline be added? Default TRUE.
 
 `...` Additional graphical arguments passed to `qqplot()`.
 
-Possibly also:
-`conf.level`
-confidence level of the band. The default, NULL, does not lead to the computation of a confidence band
-
-
 ## 4. Output
+Output returns invisibly.
 If parm specifies a single parameter, the function returns a list containing `x`, `y`, and `p` (below). If multiple parameters are specified, it returns a named list, containing one such list for each parameter.
  - x
 The quantiles of Rubin's \(t\)-approximation at the probabilities `results$p`. That is, the x coordinates of the points that were/would be plotted.
@@ -49,7 +45,6 @@ The quantiles of Rubin's \(t\)-approximation at the probabilities `results$p`. T
 The ABpool posterior samples, sorted in increasing order. That is, the y coordinates of the points that were/would be plotted.
  - p
 The probabilities used to calculate the quantiles of Rubin's t-distribution, given by ppoints(k). 
-If conf.level was specified to qqplot, the list contains additional components lwr and upr defining the confidence band
 
 ## 5. Function overview
 For multiple parameters, loop over the parameters.
