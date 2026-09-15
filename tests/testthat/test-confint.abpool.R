@@ -167,6 +167,12 @@ test_that("confint correctly applies quantile", {
   expect_equal(multi.out[1,],quantile(abpool.out.multi$samples[,1],c(0.025,0.975)), ignore_attr = TRUE)
   expect_equal(multi.out[2,],quantile(abpool.out.multi$samples[,2],c(0.025,0.975)), ignore_attr = TRUE)
   expect_equal(multi.out[3,],quantile(abpool.out.multi$samples[,3],c(0.025,0.975)), ignore_attr = TRUE)
+
+  expect_equal(confint(abpool.out.scalar, level = 0.8),quantile(abpool.out.scalar$samples,c(0.1,0.9)), ignore_attr = TRUE) # Ignore names etc.
+  expect_equal(confint(abpool.out.multi, parm = "X", level = 0.8),quantile(abpool.out.multi$samples[,"X"],c(0.1,0.9)), ignore_attr = TRUE)
+  expect_equal(confint(abpool.out.multi, level = 0.8)[1,],quantile(abpool.out.multi$samples[,1],c(0.1,0.9)), ignore_attr = TRUE)
+  expect_equal(confint(abpool.out.multi, level = 0.8)[2,],quantile(abpool.out.multi$samples[,2],c(0.1,0.9)), ignore_attr = TRUE)
+  expect_equal(confint(abpool.out.multi, level = 0.8)[3,],quantile(abpool.out.multi$samples[,3],c(0.1,0.9)), ignore_attr = TRUE)
 })
 test_that("parameter ordering outputs correctly", {
   # Selecting parameters in confint is same as subsetting after

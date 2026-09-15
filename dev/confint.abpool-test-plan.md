@@ -12,7 +12,7 @@ Inputs
 OUTPUT
 [-] one parameter - length/dimension, type, names
 [-] multi parameter - length/dimension, type, names
-[-] one parameter - correctly applies quantile
-[-] multi parameter - correctly applies quantile
+[-] one parameter - correctly applies quantile (95%, other)
+[-] multi parameter - correctly applies quantile (95%, other)
 [-] negative parm chooses correct parameters
 [-] positive parm chooses correct parameters
