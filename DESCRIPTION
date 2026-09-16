@@ -1,14 +1,18 @@
-Package: ABpool
-Title: What the Package Does (One Line, Title Case)
+Package: abpool
+Title: Approximate Bayesian Pooling for Multiple Imputation
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person("Daniel", "Phillips", , "daniel.phillips@paediatrics.ox.ac.uk", role = c("aut", "cre"))
+Description: Implements approximate Bayesian pooling (ABpool) for statistical inference after multiple imputation. Provides functions to generate approximate posterior samples, calculate credible intervals, and assess the adequacy of Rubin's rules.
+Imports:
+    mice,
+    mvtnorm
+License: `use_gpl3_license()`
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 8.1.0
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.0
+URL: https://github.com/danphillipsstats/abpool
+BugReports: https://github.com/danphillipsstats/abpool/issues

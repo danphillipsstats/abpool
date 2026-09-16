@@ -32,7 +32,7 @@
 #'
 #' @references Phillips, Christodoulou and Steinsaltz (XXXX)
 #'
-#' @seealso [QQ_compare_abpool_rubin()] to compare Rubin's rules and ABpool in a quantile-quantile (Q--Q) plot, [abpool_sample()] to sample from a vector/list of estimates and variances, [mice::with.mids()] to generate a `mira` object containing a list of model fits, [mice::mice()] to impute missing data, the output of which can be used as an input for [with()] to generate the `mira` object.
+#' @seealso [qqplot_rubin_abpool()] to compare Rubin's rules and ABpool in a quantile-quantile (Q--Q) plot, [abpool_sample()] to sample from a vector/list of estimates and variances, [mice::with.mids()] to generate a `mira` object containing a list of model fits, [mice::mice()] to impute missing data, the output of which can be used as an input for [with()] to generate the `mira` object.
 #'
 #' @examples
 #'
@@ -60,7 +60,7 @@ abpool <- function(object, parameters = NULL, dfcom = NULL, J = 1) {
   } else if (is.list(object)) {
     fits <- object
   } else {
-    stop("object must be a list of model fits, where the `l`th element gives the model fit to the `l`th imputed dataset, or a `mira` object created by `mice::with()`")
+    stop("object must be a list of model fits, where the `l`th element gives the model fit to the `l`th imputed dataset, or a `mira` object created by `with()` following the workflow of the `mice` package.")
   }
   if (length(fits) == 0L){stop("`object` must contain at least one fitted model.")}
   m <- length(fits)
