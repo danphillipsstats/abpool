@@ -462,3 +462,44 @@ test_that("plot.it and add_qqline don't affect output", {
   expect_equal(qqplot.one,qqplot_rubin_abpool(abpool.out.multi, parm = "X", plot.it = FALSE))
   expect_equal(qqplot.one,qqplot_rubin_abpool(abpool.out.multi, parm = "X", plot.it = TRUE, add_qqline = FALSE))
 })
+
+#############################################################################
+# Rubin
+abpool.out.multi.finite <- abpool.out.multi
+qqplot.multi.finite <- qqplot.multi
+abpool.out.multi.norm <- abpool(fits.lin.mice, dfcom = Inf)
+qqplot.multi.norm <- qqplot_rubin_abpool(abpool.out.multi.norm)
+estimates_X <- sapply(abpool.out.multi.finite$estimates,function(vec) vec["X"])
+estimates_Z <- sapply(abpool.out.multi.finite$estimates,function(vec) vec["Z"])
+variances_X <- sapply(abpool.out.multi.finite$variances,function(mat) mat["X","X"])
+variances_Z <- sapply(abpool.out.multi.finite$variances,function(mat) mat["Z","Z"])
+dfcom <- abpool.out.multi.finite$dfcom
+m <- abpool.out.multi.finite$m
+# Rubin X
+theta_X <- mean(estimates_X)
+b_X <- var(estimates_X)
+u_X <- mean(variances_X)
+t_X <- u_X + (1 + 1/m)*b_X
+lambda_X <- (1 + 1/m)*b_X/t_X
+# Calculate using Barnard and Rubin formula directly
+df_old_X <- (m - 1)/lambda_X^2
+df_X <- dfcom/( (dfcom + 3)/((dfcom + 1)*(1 - lambda_X)) + dfcom/df_old_X)
+rubin_t_quantiles_X <- theta_X + qt(ppoints(nrow(abpool.out.multi.finite$samples)), df = df_X) * sqrt(t_X)
+rubin_norm_quantiles_X <- theta_X + qt(ppoints(nrow(abpool.out.multi.finite$samples)), df = df_old_X) * sqrt(t_X)
+# Rubin Z
+theta_Z <- mean(estimates_Z)
+b_Z <- var(estimates_Z)
+u_Z <- mean(variances_Z)
+t_Z <- u_Z + (1 + 1/m)*b_Z
+lambda_Z <- (1 + 1/m)*b_Z/t_Z
+df_old_Z <- (m - 1)/lambda_Z^2
+df_Z <- dfcom/( (dfcom + 3)/((dfcom + 1)*(1 - lambda_Z)) + dfcom/df_old_Z)
+rubin_t_quantiles_Z <- theta_Z + qt(ppoints(nrow(abpool.out.multi.finite$samples)), df = df_Z) * sqrt(t_Z)
+rubin_norm_quantiles_Z <- theta_Z + qt(ppoints(nrow(abpool.out.multi.finite$samples)), df = df_old_Z) * sqrt(t_Z)
+# x - Rubin quantiles
+test_that("x is Rubin quantiles", {
+  expect_equal(qqplot.multi.finite[["X"]]$x,rubin_t_quantiles_X)
+  expect_equal(qqplot.multi.norm[["X"]]$x,rubin_norm_quantiles_X)
+  expect_equal(qqplot.multi.finite[["Z"]]$x,rubin_t_quantiles_Z)
+  expect_equal(qqplot.multi.norm[["Z"]]$x,rubin_norm_quantiles_Z)
+})

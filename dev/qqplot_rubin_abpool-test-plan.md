@@ -20,7 +20,7 @@ PLOTTING
 [-] Outputted x and y match values inputted to qqplot by function
 
 RUBIN
-[ ] x agrees with expected Rubin t-quantiles from hand-calculated scalar example (and mice?) (dfcom = Inf/finite)
+[-] x agrees with expected Rubin t-quantiles from hand-calculated scalar example (and mice?) (dfcom = Inf/finite)
 
 OUTPUT
 [-] returned object is invisible
