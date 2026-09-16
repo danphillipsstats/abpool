@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(ABpool)
+library(abpool)
 
-test_check("ABpool")
+test_check("abpool")
