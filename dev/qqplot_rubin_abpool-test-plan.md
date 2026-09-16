@@ -1,15 +1,15 @@
 VALIDATION
 
 Inputs
-[ ] object type abpool (accept/reject)
-[ ] parm valid numeric (NULL, length 1, > 1, reordered, negative)
-[ ] parm valid character (length 1, > 1, reordered)
-[ ] parm invalid numeric (pos and neg, larger than p)
-[ ] parm invalid character (not a parameter, a parameter in lm but not included in abpool)
-[ ] plot.it valid (TRUE/FALSE)
-[ ] add_qqline valid (TRUE/FALSE)
-[ ] plot.it/add_qqline invalid (non-booleian)
-[ ] other graphical parameters provided (xlab, ylab, main, pch. scalar and multivariate)
+[-] object type abpool (accept/reject)
+[-] parm valid numeric (NULL, length 1, > 1, reordered, negative)
+[-] parm valid character (length 1, > 1, reordered)
+[-] parm invalid numeric (pos and neg, larger than p)
+[-] parm invalid character (not a parameter, a parameter in lm but not included in abpool)
+[-] plot.it valid (TRUE/FALSE)
+[-] add_qqline valid (TRUE/FALSE)
+[-] plot.it/add_qqline invalid (non-booleian)
+[-] other graphical parameters provided (xlab, ylab, main, pch. scalar and multivariate)
 
 PLOTTING
 [ ] plot.it (TRUE/FALSE) defines plots

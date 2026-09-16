@@ -56,6 +56,9 @@ For multiple parameters, loop over the parameters.
 
 ## 6. Errors
  - If the object is not of class `abpool`.
+ No error if:
+ - plot.it = FALSE, add_qqline = TRUE. 
+ This is because qqplot_rubin_abpool(object, plot.it = FALSE) is equivalent to qqplot_rubin_abpool(object, plot.it = FALSE, add_qqline = TRUE) since TRUE is the default value. So this should simply not plot, without an error or a warning.
 
 ## 8. Warnings
 Possibly mention in details issues with J > 1, but don't warn.

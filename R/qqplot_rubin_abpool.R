@@ -96,6 +96,9 @@ qqplot_rubin_abpool <- function(object, parm = NULL, plot.it = TRUE, add_qqline 
   if (!main_supplied) {
     dots$main <- "Q-Q plot comparing Rubin's rules to ABpool"
   }
+  # plot.it, add_qqline
+  if(!is.logical(plot.it)){stop("`plot.it` must be a logical (TRUE/FALSE).")}
+  if(!is.logical(add_qqline)){stop("`add_qqline` must be a logical (TRUE/FALSE).")}
 
   # 2. Extract quantities needed to apply Rubin's rules from `object`
   m <- object$m; dfcom <- object$dfcom; estimates <- object$estimates; variances <- object$variances; samples <- object$samples
