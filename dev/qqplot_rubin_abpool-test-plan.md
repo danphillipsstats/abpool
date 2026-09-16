@@ -12,11 +12,11 @@ Inputs
 [-] other graphical parameters provided (xlab, ylab, main, pch. scalar and multivariate)
 
 PLOTTING
-[ ] plot.it (TRUE/FALSE) defines plots
-[ ] add_qqline (TRUE/FALSE) defines line
-[ ] parm defines number of plots
-[ ] xlab, ylab, main - user specified doesn't change
-[ ] pch impacts plot
+[-] plot.it (TRUE/FALSE) defines plots
+[-] parm defines number of plots
+[-] add_qqline (TRUE/FALSE) defines line
+[-] xlab, ylab, main, pch - user specified passes through (for each plot in multi)
+[-] pch impacts plot
 
 OUTPUT
 [ ] returned object is invisible

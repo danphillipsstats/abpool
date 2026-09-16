@@ -165,3 +165,210 @@ test_that("no error when other graphical inputs supplied", {
     qqplot_rubin_abpool(abpool.out.multi, pch=2)
   )
 })
+###############################################################################
+# Plotting
+test_that("qqplot_rubin_abpool passes coordinates to qqplot (scalar case)", {
+  qqplot_args <- NULL
+
+  local_mocked_bindings(
+    qqplot = function(...) {
+      qqplot_args <<- list(...)
+    },
+    .package = "stats"
+  )
+
+  result <- qqplot_rubin_abpool(abpool.out.scalar)
+
+  expect_true(!is.null(qqplot_args))
+  expect_equal(qqplot_args$x, result$x)
+  expect_equal(qqplot_args$y, result$y)
+})
+test_that("qqplot_rubin_abpool passes coordinates to qqplot for multiple parameters", {
+  qqplot_args <- list()
+
+  local_mocked_bindings(
+    qqplot = function(...) {
+      qqplot_args[[length(qqplot_args) + 1]] <<- list(...)
+    },
+    .package = "stats"
+  )
+
+  result <- qqplot_rubin_abpool(abpool.out.multi)
+
+  # One qqplot call per parameter
+  expect_length(qqplot_args, length(result))
+
+  for (i in seq_along(result)) {
+    expect_equal(qqplot_args[[i]]$x, result[[i]]$x)
+    expect_equal(qqplot_args[[i]]$y, result[[i]]$y)
+    expect_equal(qqplot_args[[i]]$main, paste("Q-Q plot:",abpool.out.multi$parameters[i])) # Title
+  }
+})
+test_that("plot.it determines whether qqplot is called (scalar)", {
+  # FALSE
+  n_qqplot <- 0L
+
+  local_mocked_bindings(
+    qqplot = function(...) {
+      n_qqplot <<- n_qqplot + 1L
+    },
+    .package = "stats"
+  )
+
+  qqplot_rubin_abpool(abpool.out.scalar, plot.it = FALSE)
+
+  expect_equal(n_qqplot, 0L)
+
+  # TRUE
+  n_qqplot <- 0L
+  qqplot_rubin_abpool(abpool.out.scalar, plot.it = TRUE)
+  expect_equal(n_qqplot, length(abpool.out.scalar$parameters))
+})
+test_that("plot.it determines whether qqplot is called (multivariate)", {
+  # FALSE
+  n_qqplot <- 0L
+
+  local_mocked_bindings(
+    qqplot = function(...) {
+      n_qqplot <<- n_qqplot + 1L
+    },
+    .package = "stats"
+  )
+
+  qqplot_rubin_abpool(abpool.out.multi, plot.it = FALSE)
+
+  expect_equal(n_qqplot, 0L)
+
+  # TRUE
+  n_qqplot <- 0L
+  qqplot_rubin_abpool(abpool.out.multi, plot.it = TRUE)
+  expect_equal(n_qqplot, length(abpool.out.multi$parameters))
+})
+# parm
+test_that("parm determines the number of plots", {
+  # supplied
+  n_qqplot <- 0L
+
+  local_mocked_bindings(
+    qqplot = function(...) {
+      n_qqplot <<- n_qqplot + 1L
+    },
+    .package = "stats"
+  )
+  parm_in <- c("X","Z")
+  qqplot_rubin_abpool(abpool.out.multi, parm = parm_in)
+
+  expect_equal(n_qqplot, length(parm_in))
+})
+# qqline
+test_that("add_qqline determines whether qqline is called (scalar)", {
+  # FALSE
+  n_qqline <- 0L
+
+  local_mocked_bindings(
+    qqline = function(...) {
+      n_qqline <<- n_qqline + 1L
+    },
+    .package = "stats"
+  )
+
+  qqplot_rubin_abpool(abpool.out.scalar, add_qqline = FALSE)
+
+  expect_equal(n_qqline, 0L)
+
+  # TRUE
+  n_qqline <- 0L
+  qqplot_rubin_abpool(abpool.out.scalar, add_qqline = TRUE)
+  expect_equal(n_qqline, length(abpool.out.scalar$parameters))
+})
+test_that("add_qqline determines whether qqline is called (multivariate)", {
+  # FALSE
+  n_qqline <- 0L
+
+  local_mocked_bindings(
+    qqline = function(...) {
+      n_qqline <<- n_qqline + 1L
+    },
+    .package = "stats"
+  )
+
+  qqplot_rubin_abpool(abpool.out.multi, add_qqline = FALSE)
+
+  expect_equal(n_qqline, 0L)
+
+  # TRUE
+  n_qqline <- 0L
+  qqplot_rubin_abpool(abpool.out.multi, add_qqline = TRUE)
+  expect_equal(n_qqline, length(abpool.out.multi$parameters))
+})
+test_that("qqplot_rubin_abpool passes coordinates to qqline (scalar case)", {
+  qqline_args <- NULL
+
+  local_mocked_bindings(
+    qqline = function(...) {
+      qqline_args <<- list(...)
+    },
+    .package = "stats"
+  )
+
+  result <- qqplot_rubin_abpool(abpool.out.scalar)
+
+  expect_true(!is.null(qqline_args))
+  expect_equal(qqline_args$y, result$y)
+})
+test_that("qqplot_rubin_abpool passes coordinates to qqline for multiple parameters", {
+  qqline_args <- list()
+
+  local_mocked_bindings(
+    qqline = function(...) {
+      qqline_args[[length(qqline_args) + 1]] <<- list(...)
+    },
+    .package = "stats"
+  )
+
+  result <- qqplot_rubin_abpool(abpool.out.multi)
+
+  # One qqline call per parameter
+  expect_length(qqline_args, length(result))
+  for (i in seq_along(result)) {
+    expect_equal(qqline_args[[i]]$y, result[[i]]$y)
+  }
+})
+test_that("qqplot_rubin_abpool passes graphical parameters to qqplot (scalar case)", {
+  qqplot_args <- NULL
+
+  local_mocked_bindings(
+    qqplot = function(...) {
+      qqplot_args <<- list(...)
+    },
+    .package = "stats"
+  )
+
+  result <- qqplot_rubin_abpool(abpool.out.scalar, main = "main", xlab = "xlab", ylab = "ylab", pch = 10)
+
+  expect_equal(qqplot_args$main, "main")
+  expect_equal(qqplot_args$xlab, "xlab")
+  expect_equal(qqplot_args$ylab, "ylab")
+  expect_equal(qqplot_args$pch, 10)
+})
+test_that("qqplot_rubin_abpool passes graphical parameters to qqplot for multiple parameters", {
+  qqplot_args <- list()
+
+  local_mocked_bindings(
+    qqplot = function(...) {
+      qqplot_args[[length(qqplot_args) + 1]] <<- list(...)
+    },
+    .package = "stats"
+  )
+
+  result <- qqplot_rubin_abpool(abpool.out.multi, main = "main", xlab = "xlab", ylab = "ylab", pch = 10)
+
+  # One qqplot call per parameter
+  expect_length(qqplot_args, length(result))
+  for (i in seq_along(result)) {
+    expect_equal(qqplot_args[[i]]$main, "main")
+    expect_equal(qqplot_args[[i]]$xlab, "xlab")
+    expect_equal(qqplot_args[[i]]$ylab, "ylab")
+    expect_equal(qqplot_args[[i]]$pch, 10)
+  }
+})
