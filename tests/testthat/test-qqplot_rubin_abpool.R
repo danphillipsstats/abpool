@@ -372,3 +372,93 @@ test_that("qqplot_rubin_abpool passes graphical parameters to qqplot for multipl
     expect_equal(qqplot_args[[i]]$pch, 10)
   }
 })
+############################################################################
+# Outputs
+qqplot.scalar <- qqplot_rubin_abpool(abpool.out.scalar)
+qqplot.multi <- qqplot_rubin_abpool(abpool.out.multi)
+qqplot.one <- qqplot_rubin_abpool(abpool.out.multi, parm = "X")
+qqplot.reord <- qqplot_rubin_abpool(abpool.out.multi, parm = c("Z","X"))
+samples.scalar <- abpool.out.scalar$samples
+ordered.samples.scalar <- samples.scalar[order(samples.scalar)]
+samples.multi <- abpool.out.multi$samples
+ordered.samples.multi <- lapply(seq_len(ncol(samples.multi)), function(i) samples.multi[,i][order(samples.multi[,i])])
+names(ordered.samples.multi) <- abpool.out.multi$parameters
+n.samples.scalar <- length(ordered.samples.scalar)
+n.samples.multi <- nrow(samples.multi)
+test_that("qqplot_rubin_abpool returns output invisibly", {
+  expect_invisible(
+    qqplot_rubin_abpool(abpool.out.scalar)
+  )
+  expect_invisible(
+    qqplot_rubin_abpool(abpool.out.multi)
+  )
+})
+# output correct
+test_that("output has correct structure", {
+  # Scalar
+  expect_true(is.list(qqplot.scalar))
+  expect_true(names(qqplot.scalar)[1] == "x")
+  expect_true(names(qqplot.scalar)[2] == "y")
+  expect_true(names(qqplot.scalar)[3] == "p")
+  expect_true(all.equal(unname(lengths(qqplot.scalar)),rep(abpool.out.scalar$m,3)))
+
+  # Multivariate
+  expect_true(is.list(qqplot.multi))
+  expect_equal(names(qqplot.multi),abpool.out.multi$parameters)
+  for (i in 1:length(qqplot.multi)){
+    expect_true(is.list(qqplot.multi[[i]]))
+    expect_true(names(qqplot.multi[[i]])[1] == "x")
+    expect_true(names(qqplot.multi[[i]])[2] == "y")
+    expect_true(names(qqplot.multi[[i]])[3] == "p")
+    expect_true(all.equal(unname(lengths(qqplot.multi[[i]])),rep(abpool.out.multi$m,3)))
+  }
+  # One parameter
+  expect_true(is.list(qqplot.one))
+  expect_true(names(qqplot.one)[1] == "x")
+  expect_true(names(qqplot.one)[2] == "y")
+  expect_true(names(qqplot.one)[3] == "p")
+  expect_true(all.equal(unname(lengths(qqplot.one)),rep(abpool.out.multi$m,3)))
+})
+
+# parm defines list structure correctly
+test_that("parm defines list structure correctly", {
+  expect_true(is.list(qqplot.reord))
+  expect_equal(names(qqplot.reord),c("Z","X"))
+  expect_equal(qqplot.reord[[1]]$y,ordered.samples.multi[["Z"]])
+  expect_equal(qqplot.reord[[2]]$y,ordered.samples.multi[["X"]])
+})
+# y - ABpool samples
+test_that("y is ordered samples", {
+  # scalar
+  expect_equal(qqplot.scalar$y,ordered.samples.scalar)
+  # multi
+  for (i in 1:length(qqplot.multi)){
+    expect_equal(qqplot.multi[[i]]$y,ordered.samples.multi[[i]])
+  }
+  # scalar
+  expect_equal(qqplot.one$y,ordered.samples.multi[["X"]])
+})
+# p - probabilities
+test_that("p is correct ppoint() output", {
+  # scalar
+  expect_equal(qqplot.scalar$p,ppoints(n.samples.scalar))
+  # multi
+  for (i in 1:length(qqplot.multi)){
+    expect_equal(qqplot.multi[[i]]$p,ppoints(n.samples.multi))
+  }
+  # scalar
+  expect_equal(qqplot.one$p,ppoints(n.samples.multi))
+})
+
+# plot.it and add_qqline don't affect output
+test_that("plot.it and add_qqline don't affect output", {
+  # scalar
+  expect_equal(qqplot.scalar,qqplot_rubin_abpool(abpool.out.scalar, plot.it = FALSE))
+  expect_equal(qqplot.scalar,qqplot_rubin_abpool(abpool.out.scalar, plot.it = TRUE, add_qqline = FALSE))
+  # multi
+  expect_equal(qqplot.multi,qqplot_rubin_abpool(abpool.out.multi, plot.it = FALSE))
+  expect_equal(qqplot.multi,qqplot_rubin_abpool(abpool.out.multi, plot.it = TRUE, add_qqline = FALSE))
+  # one
+  expect_equal(qqplot.one,qqplot_rubin_abpool(abpool.out.multi, parm = "X", plot.it = FALSE))
+  expect_equal(qqplot.one,qqplot_rubin_abpool(abpool.out.multi, parm = "X", plot.it = TRUE, add_qqline = FALSE))
+})

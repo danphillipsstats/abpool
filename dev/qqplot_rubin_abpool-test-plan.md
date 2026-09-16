@@ -17,14 +17,16 @@ PLOTTING
 [-] add_qqline (TRUE/FALSE) defines line
 [-] xlab, ylab, main, pch - user specified passes through (for each plot in multi)
 [-] pch impacts plot
+[-] Outputted x and y match values inputted to qqplot by function
+
+RUBIN
+[ ] x agrees with expected Rubin t-quantiles from hand-calculated scalar example (and mice?) (dfcom = Inf/finite)
 
 OUTPUT
-[ ] returned object is invisible
-[ ] assignment works `out <- qqplot_rubin_abpool()`
-[ ] parm defines list structure correctly
-[ ] length of outputs x,y,p
-[ ] x agrees with expected Rubin t-quantiles from hand-calculated scalar example (and mice?) (dfcom = Inf/finite)
-[ ] y is sorted object$samples
-[ ] p is ppoints(k)
-[ ] plot.it and add_qqline don't affect returned values
-[ ] Putting outputted x and y into qqplot gives same plot
+[-] returned object is invisible
+[-] returns correct object `out <- qqplot_rubin_abpool()`
+[-] parm defines list structure correctly
+[-] length of outputs x,y,p
+[-] y is sorted object$samples
+[-] p is ppoints(k)
+[-] plot.it and add_qqline don't affect returned values
