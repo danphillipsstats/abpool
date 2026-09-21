@@ -68,7 +68,7 @@ abpool(fits)
 
 }
 \references{
-Phillips, Christodoulou and Steinsaltz (2026)
+Phillips, Christodoulou and Steinsaltz,  \emph{In preparation}. Pooling after multiple imputation under posterior skewness.
 }
 \seealso{
 \code{\link[=qqplot_rubin_abpool]{qqplot_rubin_abpool()}} to compare Rubin's rules and ABpool in a quantile-quantile (Q--Q) plot;

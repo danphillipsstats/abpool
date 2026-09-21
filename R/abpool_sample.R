@@ -13,7 +13,7 @@
 #' @return A numeric vector of posterior draws for a scalar parameter, or a
 #' matrix of posterior draws for multiple parameters.
 #'
-#' @references Phillips, Christodoulou and Steinsaltz (2026)
+#' @references Phillips, Christodoulou and Steinsaltz, *In preparation*. Pooling after multiple imputation under posterior skewness.
 #'
 #' @examples
 #' # Scalar input

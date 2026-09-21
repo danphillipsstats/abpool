@@ -99,7 +99,7 @@ qqplot_rubin_abpool(abpool.out, parm = "X")
 
 }
 \references{
-Phillips DJ, Christodoulou MD and Steinsaltz D. (2026)
+Phillips DJ, Christodoulou MD and Steinsaltz D, \emph{In preparation}. Pooling after multiple imputation under posterior skewness.
 
 Barnard, J and Rubin, DB (1999). Small-sample degrees of freedom
 with multiple imputation. \emph{Biometrika}, 86(4), 948--955.

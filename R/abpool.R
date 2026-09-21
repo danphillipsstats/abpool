@@ -31,7 +31,7 @@
 #'   \item{m}{The number of imputed datasets.}
 #' }
 #'
-#' @references Phillips, Christodoulou and Steinsaltz (2026)
+#' @references Phillips, Christodoulou and Steinsaltz,  *In preparation*. Pooling after multiple imputation under posterior skewness.
 #'
 #' @seealso [qqplot_rubin_abpool()] to compare Rubin's rules and ABpool in a quantile-quantile (Q--Q) plot;
 #' [confint.abpool()] to generate ABpool credible intervals;
