@@ -35,7 +35,7 @@ data.cox <- data.frame(Y=Y,X=X,X_square=X^2,Z=Z,event=event)
 data.cox$cumhaz <- mice::nelsonaalen(data.cox,timevar=Y,statusvar=event)
 pred <- mice::make.predictorMatrix(data.cox)
 pred[, "Y"] <- 0 # do not predict using Y
-meth <- make.method(data.cox)
+meth <- mice::make.method(data.cox)
 meth["X"] <- "norm"
 meth["X_square"] <- "~I(X^2)"
 impute.cox.mice <- mice::mice(data.cox, m = 200, method = "norm", predictorMatrix = pred, print=FALSE)
