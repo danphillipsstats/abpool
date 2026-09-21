@@ -89,6 +89,9 @@ test_that("parm rejects invalid inputs", {
     confint(abpool.out.multi, parm = c(-1,3))
   )
   expect_error(
+    confint(abpool.out.multi, parm = list(1,2))
+  )
+  expect_error(
     confint(abpool.out.multi, parm = c("X","click"))
   )
   expect_error(

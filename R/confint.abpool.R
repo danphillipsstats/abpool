@@ -1,6 +1,6 @@
 #' Credible intervals for approximate Bayesian pooling
 #'
-#' Calculate credible intervals using posterior samples from approximate Bayesian pooling (ABpool) .
+#' Calculate credible intervals using posterior samples from approximate Bayesian pooling (ABpool).
 #'
 #' Credible intervals are calculated using empirical quantiles of the posterior samples returned by [abpool()].
 #'
@@ -14,7 +14,26 @@
 #' @seealso [abpool()]
 #'
 #' @examples
-#' # To add once the abpool() examples are finalised
+#'
+#' # Generate data
+#' set.seed(1)
+#' n <- 400; nobs <- 40
+#' X <- rnorm(n); Z <- sqrt(0.9)*rnorm(n) + sqrt(0.1)*X
+#' beta_0 <- 0; beta_X <- 0.8; beta_Z <- 0.2
+#' eta <- beta_0 + X*beta_X + Z*beta_Z
+#' Y <- rbinom(n, size = 1, p = exp(eta)/(1 + exp(eta)) )
+#' X[1:(n-nobs)] <- NA
+#' log.data <- data.frame(Y = Y, X = X, Z = Z)
+#' m <- 200
+#' # Impute using mice (200 imputations, predictive mean matching)
+#' imp <- mice::mice(log.data, m = m, method = "pmm", print = FALSE)
+#' fits <- with(
+#'   imp,
+#'   glm(Y ~ X + Z, family = binomial)
+#' )
+#' # Fit ABpool
+#' abpool.out <- abpool(fits)
+#' confint(abpool.out)
 #'
 #' @export
 confint.abpool <- function(object, parm = NULL, level = 0.95, ...) {
@@ -30,6 +49,7 @@ confint.abpool <- function(object, parm = NULL, level = 0.95, ...) {
     if (!valid_numeric){stop("Numeric `parm` must contain non-zero integer indices, either all positive or all negative, whose absolute values are no greater than the number of parameters. Alternatively `parm` may be `NULL`, in which case all parameters will be included, or a character vector of parameter names.")}
     parm <- object$parameters[parm]
   }
+  if (!is.character(parm)){stop("`parm` must be a numeric or character vector of parameter indices or names.")}
   if (length(parm)==0){stop("No parameters were selected by `parm`.")}
   if (!all(parm %in% object$parameters)){stop("For `parm` a character vector of parameter names, every element of `parm` must also be an element of `object$parameters`, the parameters in the ABpool sample. Otherwise `parm` may be `NULL`, in which case all parameters will be used, or a numeric vector giving indices of `object$parameters` to output.")}
   # Function
