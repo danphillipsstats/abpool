@@ -4,3 +4,16 @@ S3method(confint,abpool)
 export(abpool)
 export(abpool_sample)
 export(qqplot_rubin_abpool)
+importFrom(stats,
+  coef,
+  df.residual,
+  ppoints,
+  qqline,
+  qqplot,
+  qt,
+  quantile,
+  rnorm,
+  rt,
+  var,
+  vcov
+)
