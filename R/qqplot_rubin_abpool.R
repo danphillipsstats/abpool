@@ -13,8 +13,8 @@
 #' plotted on the x-axis and the ABpool posterior samples on the y-axis.
 #'
 #' @param object An object of class `abpool`, produced by [abpool()].
-#' @param parm The name of the parameter for which to generate the Q--Q plot.
-#'   Required when `object` contains multiple parameters. Defaults to `NULL`.
+#' @param parm A character or numeric vector specifying the parameters for which to generate the Q--Q plot.
+#'   If `NULL`, a Q--Q plot is generated for every parameter in `object`.
 #' @param plot.it Logical. Should the Q--Q plot be plotted? Defaults to `TRUE`.
 #' @param add_qqline Logical. Should a Q--Q reference line be added?
 #'   Defaults to `TRUE`.
@@ -31,7 +31,7 @@
 #'     These are the y-coordinates of the points plotted, or that would be
 #'     plotted if `plot.it = FALSE`.}
 #'   \item{p}{The probabilities used to calculate the quantiles of Rubin's
-#'     \(t\)-approximation, generated using [ppoints()].}
+#'     \(t\)-approximation used in the plot, generated using [ppoints()].}
 #' }
 #'
 #' If multiple parameters are specified, a named list containing one such
@@ -69,7 +69,27 @@
 #' [abpool()], [qqplot()], [qqline()], [ppoints()], [mice::pool()], [mice::barnard.rubin()]
 #'
 #' @examples
-#' # Minimal example to be added.
+#'
+#' # Generate data
+#' set.seed(1)
+#' n <- 400; nobs <- 40
+#' X <- rnorm(n); Z <- sqrt(0.9)*rnorm(n) + sqrt(0.1)*X
+#' beta_0 <- 0; beta_X <- 0.8; beta_Z <- 0.2
+#' eta <- beta_0 + X*beta_X + Z*beta_Z
+#' Y <- rbinom(n, size = 1, p = exp(eta)/(1 + exp(eta)) )
+#' X[1:(n-nobs)] <- NA
+#' log.data <- data.frame(Y = Y, X = X, Z = Z)
+#' m <- 200
+#' # Impute using mice (200 imputations, predictive mean matching)
+#' imp <- mice::mice(log.data, m = m, method = "pmm", print = FALSE)
+#' fits <- with(
+#'   imp,
+#'   glm(Y ~ X + Z, family = binomial)
+#' )
+#' # Fit ABpool
+#' abpool.out <- abpool(fits)
+#' # Compare ABpool and mice in a QQ plot
+#' qqplot_rubin_abpool(abpool.out, parm = "X")
 #'
 #' @export
 qqplot_rubin_abpool <- function(object, parm = NULL, plot.it = TRUE, add_qqline = TRUE, ...) {
@@ -97,8 +117,8 @@ qqplot_rubin_abpool <- function(object, parm = NULL, plot.it = TRUE, add_qqline 
     dots$main <- "Q-Q plot comparing Rubin's rules to ABpool"
   }
   # plot.it, add_qqline
-  if(!is.logical(plot.it)){stop("`plot.it` must be a logical (TRUE/FALSE).")}
-  if(!is.logical(add_qqline)){stop("`add_qqline` must be a logical (TRUE/FALSE).")}
+  if(!is.logical(plot.it) || length(plot.it) != 1L){stop("`plot.it` must be a logical (TRUE/FALSE).")}
+  if(!is.logical(add_qqline) || length(add_qqline) != 1L){stop("`add_qqline` must be a logical (TRUE/FALSE).")}
 
   # 2. Extract quantities needed to apply Rubin's rules from `object`
   m <- object$m; dfcom <- object$dfcom; estimates <- object$estimates; variances <- object$variances; samples <- object$samples
