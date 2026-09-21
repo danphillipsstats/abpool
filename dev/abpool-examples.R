@@ -1,4 +1,39 @@
 require(mice)
+# Main example
+# Generate data
+set.seed(1)
+n <- 400; nobs <- 40
+X <- rnorm(n); Z <- sqrt(0.9)*rnorm(n) + sqrt(0.1)*X
+beta_0 <- 0; beta_X <- 0.8; beta_Z <- 0.2
+eta <- beta_0 + X*beta_X + Z*beta_Z
+Y <- rbinom(n, size = 1, p = exp(eta)/(1 + exp(eta)) )
+X[1:(n-nobs)] <- NA
+log.data <- data.frame(Y = Y, X = X, Z = Z)
+m <- 200
+# Impute using mice (200 imputations)
+imp <- mice::mice(log.data, m = m, method = "pmm", print = FALSE)
+fits <- with(
+  imp,
+  glm(Y ~ X + Z, family = binomial)
+)
+# Fit ABpool
+abpool.out.200 <- abpool(fits)
+# Compare ABpool and mice in a QQ plot
+qqplot_rubin_abpool(abpool.out.200, parm = "X")
+# Observed discrepancy: increase number of imputations and fit with ABpool
+# Impute using mice ()
+m <- 10000
+imp <- mice::mice(log.data, m = m, method = "pmm", print = FALSE)
+fits <- with(
+  imp,
+  glm(Y ~ X + Z, family = binomial)
+)
+pool.out <- mice::pool(fits)
+abpool.out.1000 <- abpool(fits)
+qqplot_rubin_abpool(abpool.out.1000, parm = "X")
+abpool_density <- density(abpool.out.1000$samples[,"X"])
+plot(abpool_density)
+lines(dt((abpool_density$x-pool.out$pooled$estimate[2])/sqrt(pool.out$pooled$t[2]),df=pool.out$pooled$df[2])~abpool_density$x)
 # mice - linear regression
 n <- 100
 X <- rnorm(n)
