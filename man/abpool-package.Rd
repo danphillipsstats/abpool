@@ -5,7 +5,7 @@
 \alias{abpool-package}
 \title{abpool: Approximate Bayesian Pooling for Multiple Imputation}
 \description{
-Implements approximate Bayesian pooling (ABpool) for statistical inference after multiple imputation. Provides functions to generate approximate posterior samples, calculate credible intervals, and assess the adequacy of Rubin's rules.
+Implements approximate Bayesian pooling (ABpool) for statistical inference after multiple imputation. Provides functions to generate approximate posterior samples, calculate credible intervals, and a diagnostic for Rubin's rules.
 }
 \seealso{
 Useful links:
