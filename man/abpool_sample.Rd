@@ -69,3 +69,6 @@ abpool_sample(estimates,variances, dfcom = Inf)
 \references{
 Phillips, Christodoulou and Steinsaltz (2026)
 }
+\seealso{
+\code{\link[=abpool]{abpool()}} to sample from a \code{mira} object or list of fitted models. \code{\link[=abpool]{abpool()}} also outputs an object which can be analysed by the rest of the package e.g. \code{\link[=qqplot_rubin_abpool]{qqplot_rubin_abpool()}} and \code{\link[=confint.abpool]{confint.abpool()}}, unlike \code{\link[=abpool_sample]{abpool_sample()}}.
+}

@@ -48,5 +48,5 @@ confint(abpool.out)
 
 }
 \seealso{
-\code{\link[=abpool]{abpool()}}
+\code{\link[=abpool]{abpool()}}, \code{\link[=qqplot_rubin_abpool]{qqplot_rubin_abpool()}}
 }

@@ -55,6 +55,9 @@
 #' # Sample from ABpool
 #' abpool_sample(estimates,variances, dfcom = Inf)
 #'
+#' @seealso
+#' [abpool()] to sample from a `mira` object or list of fitted models. [abpool()] also outputs an object which can be analysed by the rest of the package e.g. [qqplot_rubin_abpool()] and [confint.abpool()], unlike [abpool_sample()].
+#'
 #' @export
 abpool_sample <- function(estimates, variances, dfcom, J = 1) {
 

@@ -108,5 +108,5 @@ Rubin, DB (1987). \emph{Multiple Imputation for Nonresponse in Surveys}.
 Wiley.
 }
 \seealso{
-\code{\link[=abpool]{abpool()}}, \code{\link[=qqplot]{qqplot()}}, \code{\link[=qqline]{qqline()}}, \code{\link[=ppoints]{ppoints()}}, \code{\link[mice:pool]{mice::pool()}}
+\code{\link[=abpool]{abpool()}}, \code{\link[=confint.abpool]{confint.abpool()}}
 }

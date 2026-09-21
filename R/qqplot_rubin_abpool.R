@@ -66,7 +66,7 @@
 #' Wiley.
 #'
 #' @seealso
-#' [abpool()], [qqplot()], [qqline()], [ppoints()], [mice::pool()]
+#' [abpool()], [confint.abpool()]
 #'
 #' @examples
 #'

@@ -73,7 +73,5 @@ Phillips, Christodoulou and Steinsaltz (2026)
 \seealso{
 \code{\link[=qqplot_rubin_abpool]{qqplot_rubin_abpool()}} to compare Rubin's rules and ABpool in a quantile-quantile (Q--Q) plot;
 \code{\link[=confint.abpool]{confint.abpool()}} to generate ABpool credible intervals;
-\code{\link[=abpool_sample]{abpool_sample()}} to sample from a vector/list of estimates and variances;
-\code{\link[mice:with.mids]{mice::with.mids()}} to generate a \code{mira} object containing a list of model fits;
-\code{\link[mice:mice]{mice::mice()}} to impute missing data, the output of which can be used as an input for \code{\link[=with]{with()}} to generate the \code{mira} object.
+\code{\link[=abpool_sample]{abpool_sample()}} to sample from a vector/list of estimates and variances.
 }

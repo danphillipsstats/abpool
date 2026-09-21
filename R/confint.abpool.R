@@ -11,7 +11,7 @@
 #'
 #' @return A matrix containing the lower and upper credible limits for each requested parameter, with one row per parameter.
 #'
-#' @seealso [abpool()]
+#' @seealso [abpool()], [qqplot_rubin_abpool()]
 #'
 #' @examples
 #'

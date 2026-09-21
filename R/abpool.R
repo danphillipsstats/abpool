@@ -35,9 +35,7 @@
 #'
 #' @seealso [qqplot_rubin_abpool()] to compare Rubin's rules and ABpool in a quantile-quantile (Q--Q) plot;
 #' [confint.abpool()] to generate ABpool credible intervals;
-#' [abpool_sample()] to sample from a vector/list of estimates and variances;
-#' [mice::with.mids()] to generate a `mira` object containing a list of model fits;
-#' [mice::mice()] to impute missing data, the output of which can be used as an input for [with()] to generate the `mira` object.
+#' [abpool_sample()] to sample from a vector/list of estimates and variances.
 #'
 #' @examples
 #'
