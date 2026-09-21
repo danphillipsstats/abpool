@@ -1,14 +1,13 @@
 #####
 # mice - linear regression
 set.seed(1)
-require(mice)
 n <- 100
 X <- rnorm(n); Z <- rnorm(n)
 Y <- 1+3*X + Z + rnorm(n)
 X[1:50] <- NA
 data.lin <- data.frame(Y=Y,X=X,Z=Z)
 m <- 200
-impute.mice <- mice(data.lin, m = m, method = "norm", print=FALSE)
+impute.mice <- mice::mice(data.lin, m = m, method = "norm", print=FALSE)
 fits.lin.mice <- with(impute.mice, lm(Y~X+Z))
 abpool.out.multi <- abpool(fits.lin.mice)
 abpool.out.scalar <- abpool(fits.lin.mice, parameters = "X")

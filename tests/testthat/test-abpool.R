@@ -2,14 +2,13 @@
 # Models that work
 # mice - linear regression
 set.seed(1)
-require(mice)
 n <- 100
 X <- rnorm(n)
 Y <- 1+3*X + rnorm(n)
 X[1:50] <- NA
 data.lin <- data.frame(Y=Y,X=X)
 m <- 200
-impute.mice <- mice(data.lin, m = m, method = "norm", print=FALSE)
+impute.mice <- mice::mice(data.lin, m = m, method = "norm", print=FALSE)
 fits.lin.mice <- with(impute.mice, lm(Y~X))
 # mice - logistic regression with bsplines
 set.seed(1)
@@ -20,11 +19,10 @@ Y <- rbinom(n,size=1,prob=plogis(1+3*X+Z + rnorm(n)))
 X[1:50] <- NA
 m <- 200
 data.log <- data.frame(Y=Y,X=X,Z=Z)
-impute.mice <- mice(data.log, m = 200, method = "norm", print=FALSE)
+impute.mice <- mice::mice(data.log, m = 200, method = "norm", print=FALSE)
 fits.log.mice <- with(impute.mice, glm(Y~splines::bs(X, knots = c(-0.5,0.5), degree = 3), family = "binomial"))
 # mice - Cox regression with square
 set.seed(1)
-require(survival)
 n <- 500
 X <- rnorm(n)
 Z <- 0.3*X + rnorm(n)
@@ -40,7 +38,7 @@ pred[, "Y"] <- 0 # do not predict using Y
 meth <- make.method(data.cox)
 meth["X"] <- "norm"
 meth["X_square"] <- "~I(X^2)"
-impute.cox.mice <- mice(data.cox, m = 200, method = "norm", predictorMatrix = pred, print=FALSE)
+impute.cox.mice <- mice::mice(data.cox, m = 200, method = "norm", predictorMatrix = pred, print=FALSE)
 fits.cox.mice <- with(impute.cox.mice, survival::coxph(survival::Surv(Y,event)~poly(X,2)+Z))
 # List of estimates and variances
 list_estimates <- list(c(x = 1, z = 2), c(x = 3, z = 4), c(x = 5, z = 6) )
@@ -48,19 +46,17 @@ variance_mat <- matrix(c(1,0.1,0.1,2),2,2)
 list_variances <- list(variance_mat, variance_mat, variance_mat)
 # mice - linear regression, m = 1
 set.seed(1)
-require(mice)
 n <- 100
 X <- rnorm(n)
 Y <- 1+3*X + rnorm(n)
 X[1:50] <- NA
 data.lin <- data.frame(Y=Y,X=X)
-impute.mice <- mice(data.lin, m = 1, method = "norm", print=FALSE)
+impute.mice <- mice::mice(data.lin, m = 1, method = "norm", print=FALSE)
 fits.lin.mice.one <- with(impute.mice, lm(Y~X))
 #####
 # models that break
 # mice + lmer - coef doesn't work properly for lmer
 set.seed(1)
-require(lme4)
 n_id <- 100
 n_rep <- 3
 id <- factor(rep(seq_len(n_id), each = n_rep))
@@ -72,10 +68,10 @@ X[1:30] <- NA
 data.lmer <- data.frame(id = id, X = rep(X, each = n_rep), Y = Y)
 pred <- mice::make.predictorMatrix(data.lmer)
 pred[, "id"] <- 0
-impute.mice <- mice(data.lmer, m = 200, predictorMatrix = pred, print = FALSE)
+impute.mice <- mice::mice(data.lmer, m = 200, predictorMatrix = pred, print = FALSE)
 fits.lmer.mice <- with(
   impute.mice,
-  lmer(Y ~ X + (1 | id))
+  lme4::lmer(Y ~ X + (1 | id))
 )
 # mice - linear regression, estimates fail
 set.seed(1)
@@ -87,7 +83,7 @@ Y <- 1+3*X + Z + rnorm(n)
 X[1:50] <- NA
 data.lin <- data.frame(Y=Y,X=X)
 m <- 200
-impute.mice <- mice(data.lin, m = m, method = "norm", print=FALSE)
+impute.mice <- mice::mice(data.lin, m = m, method = "norm", print=FALSE)
 fits.lin.mice.est.error <- with(impute.mice, lm(Y~X+Z))
 # mice - linear regression, df error
 set.seed(1)
@@ -98,7 +94,7 @@ Y <- 1+3*X + rnorm(n)
 X[1:50] <- NA
 data.lin <- data.frame(Y=Y,X=X)
 m <- 200
-impute.mice <- mice(data.lin, m = m, method = "norm", print=FALSE)
+impute.mice <- mice::mice(data.lin, m = m, method = "norm", print=FALSE)
 impute.mice$imp$X[1,1] <- NA # Make an imputation NA so complete case will ignore this individual in lm, making df.residual = n - p smaller by 1.
 fits.lin.mice.df.error <- with(impute.mice, lm(Y~X))
 # list - linear regression
