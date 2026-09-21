@@ -67,5 +67,5 @@ abpool_sample(estimates,variances, dfcom = Inf)
 
 }
 \references{
-Phillips, Christodoulou and Steinsaltz (XXXX)
+Phillips, Christodoulou and Steinsaltz (2026)
 }
