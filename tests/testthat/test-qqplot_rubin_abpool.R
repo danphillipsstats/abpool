@@ -173,7 +173,7 @@ test_that("qqplot_rubin_abpool passes coordinates to qqplot (scalar case)", {
     qqplot = function(...) {
       qqplot_args <<- list(...)
     },
-    .package = "stats"
+    .package = "abpool"
   )
 
   result <- qqplot_rubin_abpool(abpool.out.scalar)
@@ -189,7 +189,7 @@ test_that("qqplot_rubin_abpool passes coordinates to qqplot for multiple paramet
     qqplot = function(...) {
       qqplot_args[[length(qqplot_args) + 1]] <<- list(...)
     },
-    .package = "stats"
+    .package = "abpool"
   )
 
   result <- qqplot_rubin_abpool(abpool.out.multi)
@@ -211,7 +211,7 @@ test_that("plot.it determines whether qqplot is called (scalar)", {
     qqplot = function(...) {
       n_qqplot <<- n_qqplot + 1L
     },
-    .package = "stats"
+    .package = "abpool"
   )
 
   qqplot_rubin_abpool(abpool.out.scalar, plot.it = FALSE)
@@ -231,7 +231,7 @@ test_that("plot.it determines whether qqplot is called (multivariate)", {
     qqplot = function(...) {
       n_qqplot <<- n_qqplot + 1L
     },
-    .package = "stats"
+    .package = "abpool"
   )
 
   qqplot_rubin_abpool(abpool.out.multi, plot.it = FALSE)
@@ -252,7 +252,7 @@ test_that("parm determines the number of plots", {
     qqplot = function(...) {
       n_qqplot <<- n_qqplot + 1L
     },
-    .package = "stats"
+    .package = "abpool"
   )
   parm_in <- c("X","Z")
   qqplot_rubin_abpool(abpool.out.multi, parm = parm_in)
@@ -268,7 +268,7 @@ test_that("add_qqline determines whether qqline is called (scalar)", {
     qqline = function(...) {
       n_qqline <<- n_qqline + 1L
     },
-    .package = "stats"
+    .package = "abpool"
   )
 
   qqplot_rubin_abpool(abpool.out.scalar, add_qqline = FALSE)
@@ -288,7 +288,7 @@ test_that("add_qqline determines whether qqline is called (multivariate)", {
     qqline = function(...) {
       n_qqline <<- n_qqline + 1L
     },
-    .package = "stats"
+    .package = "abpool"
   )
 
   qqplot_rubin_abpool(abpool.out.multi, add_qqline = FALSE)
@@ -307,7 +307,7 @@ test_that("qqplot_rubin_abpool passes coordinates to qqline (scalar case)", {
     qqline = function(...) {
       qqline_args <<- list(...)
     },
-    .package = "stats"
+    .package = "abpool"
   )
 
   result <- qqplot_rubin_abpool(abpool.out.scalar)
@@ -322,7 +322,7 @@ test_that("qqplot_rubin_abpool passes coordinates to qqline for multiple paramet
     qqline = function(...) {
       qqline_args[[length(qqline_args) + 1]] <<- list(...)
     },
-    .package = "stats"
+    .package = "abpool"
   )
 
   result <- qqplot_rubin_abpool(abpool.out.multi)
@@ -340,7 +340,7 @@ test_that("qqplot_rubin_abpool passes graphical parameters to qqplot (scalar cas
     qqplot = function(...) {
       qqplot_args <<- list(...)
     },
-    .package = "stats"
+    .package = "abpool"
   )
 
   result <- qqplot_rubin_abpool(abpool.out.scalar, main = "main", xlab = "xlab", ylab = "ylab", pch = 10)
@@ -357,7 +357,7 @@ test_that("qqplot_rubin_abpool passes graphical parameters to qqplot for multipl
     qqplot = function(...) {
       qqplot_args[[length(qqplot_args) + 1]] <<- list(...)
     },
-    .package = "stats"
+    .package = "abpool"
   )
 
   result <- qqplot_rubin_abpool(abpool.out.multi, main = "main", xlab = "xlab", ylab = "ylab", pch = 10)
