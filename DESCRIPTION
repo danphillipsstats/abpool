@@ -7,7 +7,7 @@ Description: Implements approximate Bayesian pooling (ABpool) for statistical in
 Imports:
     mice,
     mvtnorm
-License: `use_gpl3_license()`
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Suggests:
