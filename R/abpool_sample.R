@@ -16,10 +16,12 @@
 #' @references Phillips, Christodoulou and Steinsaltz (XXXX)
 #'
 #' @examples
+#' # Scalar input
 #' estimates <- c(1,2,3)
 #' variances <- c(1,2,3)
 #' abpool_sample(estimates, variances, dfcom = Inf)
 #'
+#' # Multi-parameter input
 #' estimates <- list(
 #' c(x = 1, z = 2),
 #' c(x = 3, z = 4)
@@ -30,6 +32,28 @@
 #' )
 #' abpool_sample(estimates, variances, dfcom = 19)
 #'
+#' # Example with manually generated model fits after multiple imputation
+#' # Generate data
+#' set.seed(1)
+#' n <- 400; nobs <- 40
+#' X <- rnorm(n); Z <- sqrt(0.9)*rnorm(n) + sqrt(0.1)*X
+#' beta_0 <- 0; beta_X <- 0.8; beta_Z <- 0.2
+#' eta <- beta_0 + X*beta_X + Z*beta_Z
+#' Y <- rbinom(n, size = 1, p = exp(eta)/(1 + exp(eta)) )
+#' X[1:(n-nobs)] <- NA
+#' log.data <- data.frame(Y = Y, X = X, Z = Z)
+#' m <- 200
+#' # Illustrative imputation procedure
+#' estimates <- list(); variances <- list()
+#' for (i in 1:m){
+#'   X[1:(n-nobs)] <- rnorm(n-nobs)
+#'   log.data.imp.i <- data.frame(Y = Y, X = X, Z = Z)
+#'   glm.out.i <- glm(Y ~ X + Z, family = binomial)
+#'   estimates[[i]] <- coef(glm.out.i)
+#'   variances[[i]] <- vcov(glm.out.i)
+#' }
+#' # Sample from ABpool
+#' abpool_sample(estimates,variances, dfcom = Inf)
 #'
 #' @export
 abpool_sample <- function(estimates, variances, dfcom, J = 1) {

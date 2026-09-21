@@ -66,7 +66,7 @@
 #' with multiple imputation. *Biometrika*, 86(4), 948--955.
 #'
 #' @seealso
-#' [abpool()], [qqplot()], [qqline()], [ppoints()], [mice::pool()], [mice::barnard.rubin()]
+#' [abpool()], [qqplot()], [qqline()], [ppoints()], [mice::pool()]
 #'
 #' @examples
 #'
