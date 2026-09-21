@@ -58,17 +58,17 @@ plotted on the x-axis and the ABpool posterior samples on the y-axis.
 
 For each parameter, Rubin's t-approximation has location
 \eqn{
-\bar{\theta} = \frac{1}{m}\sum_{l=1}^{m}(\hat{\theta}^{(l)})
+\bar{\theta} = \frac{1}{m}\sum_{l=1}^{m}\hat{\theta}^{(l)}
 }
 and squared scale
 \eqn{
 V = \bar{U} + \left(1 + \frac{1}{m}\right)B,
 }
-where \eqn{\bar{U} = \frac{1}{m}\sum_{l=1}^{m}(U^{(l)})} is the mean within-imputation variance and \eqn{B=\frac{1}{m}\sum_{l=1}^m (\hat{\theta}^{(l)} - \bar{\theta})^2} is
+where \eqn{\bar{U} = \frac{1}{m}\sum_{l=1}^{m}U^{(l)}} is the mean within-imputation variance and \eqn{B=\frac{1}{m}\sum_{l=1}^m (\hat{\theta}^{(l)} - \bar{\theta})^2} is
 the between-imputation variance.
 The degrees of freedom are calculated
 using the Barnard--Rubin method, which simplifies to Rubin's original method
-when the complete-data degrees of freedom are infinite.
+when the complete-data degrees of freedom are infinite. The complete-data degrees of freedom are chosen to match those used by ABpool.
 
 The resulting t-distribution is compared with the ABpool posterior
 samples by comparing ordered samples to t-quantiles,
