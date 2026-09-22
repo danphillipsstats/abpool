@@ -22,24 +22,13 @@ library(abpool)
 ## Overview
 
 Approximate Bayesian pooling (ABpool) approximates the observed-data
-posterior distribution after multiple imputation. For the $l$th imputed
-dataset, let the completed-data estimate and associated variance be
-given by
-
-``` math
-\hat{\theta}^{*(l)}, \qquad U^{*(l)}
-```
-
-ABpool approximates the posterior by drawing samples
-
-``` math
-\theta^{*(l)} \sim t_{\nu_\text{com}}(\hat{\theta}^{*(l)},U^{*(l)})
-```
-
-where $t_\nu(\mu,\sigma^2)$ denotes a location-scale $`t`$-distribution
-with location $`\mu`$, scale $`\sigma`$ and $`\nu`$ degrees of freedom.
-For the multivariate case, $\theta^{*(l)}$ is drawn from the equivalent
-multivariate $`t`$-distribution.
+posterior distribution after multiple imputation. For each imputed
+dataset, ABpool draws once from a location-scale $t$-distribution,
+centered at the completed-data estimate, with squared scale (or scale
+matrix) given by the associated variance, and an appropriate choice of
+complete-data degrees of freedom. Where the complete-data degrees of
+freedom are infinite, draws are taken from the corresponding Gaussian
+distribution.
 
 We present a diagnostic workflow, to test the appropriateness of the
 approximation given by Rubin’s rules for a particular analysis and
