@@ -38,13 +38,10 @@ lin.data <- data.frame(Y = Y, X = X, Z = Z)
 # Impute using mice (200 imputations)
 m <- 200
 imp <- mice::mice(lin.data, m = m, method = "norm", print = FALSE)
-fits.lin.200 <- with(
-  imp,
-  lm(Y ~ X + Z)
-)
+fits.lin.200 <- with(imp, lm(Y ~ X + Z))
 # Fit ABpool
 abpool.lin.200 <- abpool(fits.lin.200)
-# Compare ABpool and mice in a QQ plot
+# Compare ABpool and Rubin's rules in a QQ plot
 qqplot_rubin_abpool(abpool.lin.200, parm = "X")
 # No meaningful discrepancy: proceed using Rubin's rules
 pool.lin <- mice::pool(fits.lin.200)

@@ -1,36 +1,69 @@
+
 # abpool: Approximate Bayesian Pooling for Multiple Imputation
 
-Implements approximate Bayesian pooling (ABpool) for statistical inference after multiple imputation as described in Phillips, Christodoulou and Steinsaltz, ``Pooling after multiple imputation under posterior skewness" (in preparation). Provides functions to generate approximate posterior samples, calculate credible intervals, and a diagnostic for Rubin's rules.
+Implements approximate Bayesian pooling (ABpool) for statistical
+inference after multiple imputation as described in Phillips,
+Christodoulou and Steinsaltz, \`\`Pooling after multiple imputation
+under posterior skewness” (in preparation). Provides functions to
+generate approximate posterior samples, calculate credible intervals,
+and a diagnostic for Rubin’s rules.
 
 ## Installation
 
-```r
+``` r
 install.packages("devtools")
 devtools::install_github("danphillipsstats/abpool")
 ```
 
-```r
+``` r
 library(abpool)
 ```
 
 ## Overview
 
-Approximate Bayesian pooling (ABpool) approximates the observed-data posterior distribution after multiple imputation. For the $l$th imputed dataset, let $\hat{\theta}^{*(l)}$ and $U^{*(l)}$ be the completed-data estimate and associated variance. ABpool approximates the posterior by drawing samples $\theta^{*(l)} \sim t_{\nu_\text{com}}(\hat{\theta}^{*(l)},U^{*(l)})$, where $t_\nu(\mu,\sigma^2)$ denotes a location-scale $t$-distribution with location $\mu$, scale $\sigma^2$ and $\nu$ degrees of freedom. For the multivariate case, $\theta^{*(l)}$ is drawn from the equivalent multivariate $t$-distribution. 
+Approximate Bayesian pooling (ABpool) approximates the observed-data
+posterior distribution after multiple imputation. For the $l$th imputed
+dataset, let $\hat{\theta}^{*(l)}$ and $U^{*(l)}$ be the completed-data
+estimate and associated variance. ABpool approximates the posterior by
+drawing samples
+$\theta^{*(l)} \sim t_{\nu_\text{com}}(\hat{\theta}^{*(l)},U^{*(l)})$,
+where $t_\nu(\mu,\sigma^2)$ denotes a location-scale $t$-distribution
+with location $\mu$, scale $\sigma$ and $\nu$ degrees of freedom. For
+the multivariate case, $\theta^{*(l)}$ is drawn from the equivalent
+multivariate $t$-distribution.
 
-We present a diagnostic workflow, to test the appropriateness of the approximation given by Rubin's rules for a particular analysis and dataset. We suggest to generate 200 or more imputations, and then compare ABpool samples to the quantiles of Rubin's $t$-approximation in a Q--Q plot. If the two distributions meaningfully differ, Rubin's rules may not be fully accounting for higher order posterior moments, such as posterior skewness. Hence inference should be performed using an alternative method, such as ABpool. If the two distributions show no meaningful difference, inference may be performed using Rubin's rules.
+We present a diagnostic workflow, to test the appropriateness of the
+approximation given by Rubin’s rules for a particular analysis and
+dataset. We suggest to generate 200 or more imputations, and then
+compare ABpool samples to the quantiles of Rubin’s $t$-approximation in
+a Q–Q plot. If the two distributions meaningfully differ, Rubin’s rules
+may not be fully accounting for higher order posterior moments, such as
+posterior skewness. Hence inference should be performed using an
+alternative method, such as ABpool. If the two distributions show no
+meaningful difference, inference may be performed using Rubin’s rules.
 
-The main function, `abpool()` generates ABpool posterior samples using model fits on multiple imputed datasets.
-`qqplot_rubin_abpool()` implements the diagnostic proposed in the accompanying paper by comparing the ABpool posterior distribution to Rubin's $t$-approximation, where a meaningful difference may indicate Rubin's rules is not properly accounting for higher order posterior moments such as skewness.
-`confint.abpool()` allows the calculation of credible intervals from ABpool samples.
-For users who have estimates and variance estimates from each imputation, rather than fitted model objects, `abpool_sample()` provides a lower-level interface.
+The main function, `abpool()` generates ABpool posterior samples using
+model fits on multiple imputed datasets. `qqplot_rubin_abpool()`
+implements the diagnostic proposed in the accompanying paper by
+comparing the ABpool posterior distribution to Rubin’s
+$t$-approximation, where a meaningful difference may indicate Rubin’s
+rules is not properly accounting for higher order posterior moments such
+as skewness. `confint.abpool()` allows the calculation of credible
+intervals from ABpool samples. For users who have estimates and variance
+estimates from each imputation, rather than fitted model objects,
+`abpool_sample()` provides a lower-level interface.
 
-## Example 1: Rubin's rules and ABpool differ (logistic regression, high missingness)
+## Example 1: Rubin’s rules and ABpool differ (logistic regression, high missingness)
 
-We generate data from a logistic regression example with a very high proportion of missing data. We observe a meaningful difference in distribution between ABpool and Rubin's approximation, due to posterior skewness. Hence Rubin's rules may be inappropriate, and we perform inference using ABpool.
+We generate data from a logistic regression example with a very high
+proportion of missing data. We observe a meaningful difference in
+distribution between ABpool and Rubin’s approximation, due to posterior
+skewness. Hence Rubin’s rules may be inappropriate, and we perform
+inference using ABpool.
 
 ### Generate the data
 
-```r
+``` r
 # Generate data
 set.seed(1)
 n <- 400; nobs <- 40
@@ -44,9 +77,10 @@ log.data <- data.frame(Y = Y, X = X, Z = Z)
 
 ### Impute the missing data and fit the analysis model
 
-We generate 200 imputations, impute using predictive mean matching, and fit a logistic regression model.
+We generate 200 imputations, impute using predictive mean matching, and
+fit a logistic regression model.
 
-```r
+``` r
 # Impute using mice (200 imputations)
 m <- 200
 imp <- mice::mice(log.data, m = m, method = "pmm", print = FALSE)
@@ -55,27 +89,36 @@ fits.log.200 <- with(imp, glm(Y ~ X + Z, family = binomial))
 
 ### Apply ABpool
 
-The `abpool()` function samples ABpool posterior draws. We specify the complete-data degrees of freedom to be infinite, meaning we sample from a normal distribution in this case.
+The `abpool()` function samples ABpool posterior draws. We specify the
+complete-data degrees of freedom to be infinite, meaning we sample from
+a normal distribution in this case.
 
-```r
+``` r
 abpool.log.200 <- abpool(fits.log.200, dfcom = Inf)
 ```
 
-### Diagnostic for Rubin's rules
+### Diagnostic for Rubin’s rules
 
-We compare the ABpool posterior samples to the quantiles from Rubin's $t$-approximation in a Q--Q plot. A meaningful discrepancy may indicate Rubin's rules fails to appropriately account for higher-order posterior moments.
+We compare the ABpool posterior samples to the quantiles from Rubin’s
+$t$-approximation in a Q–Q plot. A meaningful discrepancy may indicate
+Rubin’s rules fails to appropriately account for higher-order posterior
+moments.
 
-```r
+``` r
 qqplot_rubin_abpool(abpool.log.200, parm = "X")
 ```
 
-The Q--Q plot indicates the ABpool posterior is skewed, which Rubin's rules is unable to account for. We therefore proceed with inference using ABpool, as Rubin's rules may not be appropriate in this scenario.
+The Q–Q plot indicates the ABpool posterior is skewed, which Rubin’s
+rules is unable to account for. We therefore proceed with inference
+using ABpool, as Rubin’s rules may not be appropriate in this scenario.
 
 ### Perform inference using ABpool
 
-We increase the number of imputations to reduce the Monte-Carlo error from ABpool when generating posterior quantities such as credible intervals.
+We increase the number of imputations to reduce the Monte-Carlo error
+from ABpool when generating posterior quantities such as credible
+intervals.
 
-```r
+``` r
 # Impute using mice
 m <- 1000
 imp <- mice::mice(log.data, m = m, method = "pmm", print = FALSE)
@@ -88,15 +131,19 @@ mean(samples)
 confint(abpool.log.1000)["X",]
 ```
 
-Where the ABpool posterior distribution and Rubin's $t$-approximation differ meaningfully, Rubin's rules may not be an appropriate choice for inference, and an alternative such as ABpool should be considered.
+Where the ABpool posterior distribution and Rubin’s $t$-approximation
+differ meaningfully, Rubin’s rules may not be an appropriate choice for
+inference, and an alternative such as ABpool should be considered.
 
-## Example 2: Rubin's rules and ABpool equivalent (linear regression, low missingness)
+## Example 2: Rubin’s rules and ABpool equivalent (linear regression, low missingness)
 
-In this example, the ABpool posterior and Rubin's $t$-approximation give very similar results. Hence Rubin's rules is appropriate, and may be used for future inference.
+In this example, the ABpool posterior and Rubin’s $t$-approximation give
+very similar results. Hence Rubin’s rules is appropriate, and may be
+used for future inference.
 
 ### Generate and analyse the multiply imputed data
 
-```r
+``` r
 set.seed(1)
 n <- 220; nobs <- 200
 X <- rnorm(n); Z <- sqrt(0.9)*rnorm(n) + sqrt(0.1)*X
@@ -111,48 +158,62 @@ imp <- mice::mice(lin.data, m = m, method = "norm", print = FALSE)
 fits.lin.200 <- with(imp, lm(Y ~ X + Z))
 ```
 
-### Diagnostic for Rubin's rules
+### Diagnostic for Rubin’s rules
 
-```r
+``` r
 # Fit ABpool
 abpool.lin.200 <- abpool(fits.lin.200)
 # Compare ABpool and Rubin's rules in a QQ plot
 qqplot_rubin_abpool(abpool.lin.200, parm = "X")
 ```
 
-The Q--Q plot does not indicate a meaningful difference in distribution between the ABpool samples and Rubin's $t$-approximation. Hence we proceed using Rubin's rules
+The Q–Q plot does not indicate a meaningful difference in distribution
+between the ABpool samples and Rubin’s $t$-approximation. Hence we
+proceed using Rubin’s rules
 
-### Perform inference using Rubin's rules
+### Perform inference using Rubin’s rules
 
-```r
+``` r
 pool.lin <- mice::pool(fits.lin.200)
 summary(pool.lin, conf.int = TRUE)[2,c("conf.low","conf.high")]
 ```
 
 ## Functions
 
-The main function, `abpool()` generates ABpool posterior samples using model fits on multiple imputed datasets.
-`qqplot_rubin_abpool()` implements the diagnostic proposed in the accompanying paper by comparing the ABpool posterior distribution to Rubin's $t$-approximation, where a meaningful difference may indicate Rubin's rules is not properly accounting for higher order posterior moments such as skewness.
-`confint.abpool()` allows the calculation of credible intervals from ABpool samples.
-For users who have estimates and variance estimates from each imputation, rather than fitted model objects, `abpool_sample()` provides a lower-level interface.
+The main function, `abpool()` generates ABpool posterior samples using
+model fits on multiple imputed datasets. `qqplot_rubin_abpool()`
+implements the diagnostic proposed in the accompanying paper by
+comparing the ABpool posterior distribution to Rubin’s
+$t$-approximation, where a meaningful difference may indicate Rubin’s
+rules is not properly accounting for higher order posterior moments such
+as skewness. `confint.abpool()` allows the calculation of credible
+intervals from ABpool samples. For users who have estimates and variance
+estimates from each imputation, rather than fitted model objects,
+`abpool_sample()` provides a lower-level interface.
 
-- `abpool()` — generates ABpool posterior samples using model fits on multiple imputed datasets.
-- `qqplot_rubin_abpool()` — compares the ABpool posterior distribution to Rubin's $t$-approximation in a Q--Q plot.
-- `confint()` — generates an ABpool credible interval given an object of class `abpool`, as outputted from the `abpool()` function.
-- `abpool_sample()` — draws samples from ABpool given estimates and variances for each imputation. Lower-level interface - to integrate nicely with the rest of the package, use `abpool()` instead.
+- `abpool()` — generates ABpool posterior samples using model fits on
+  multiple imputed datasets.
+- `qqplot_rubin_abpool()` — compares the ABpool posterior distribution
+  to Rubin’s $t$-approximation in a Q–Q plot.
+- `confint()` — generates an ABpool credible interval given an object of
+  class `abpool`, as outputted from the `abpool()` function.
+- `abpool_sample()` — draws samples from ABpool given estimates and
+  variances for each imputation. Lower-level interface - to integrate
+  nicely with the rest of the package, use `abpool()` instead.
 
 ## Documentation
 
-[Explain how to access the individual help pages and/or reference manual.]
+\[Explain how to access the individual help pages and/or reference
+manual.\]
 
 ## Citation
 
 If you use `abpool`, please cite:
 
-```r
+``` r
 citation("abpool")
 ```
 
 ## License
 
-GPL (>=3)
+GPL (\>=3)
