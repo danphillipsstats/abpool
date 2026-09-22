@@ -201,8 +201,17 @@ estimates from each imputation, rather than fitted model objects,
 
 ## Documentation
 
-\[Explain how to access the individual help pages and/or reference
-manual.\]
+Documentation for individual functions is available through the R help
+system, for example:
+
+``` r
+?abpool
+?abpool_sample
+?qqplot_rubin_abpool
+?confint.abpool
+```
+
+A reference manual is available [here](abpool-reference-manual.pdf).
 
 ## Citation
 
