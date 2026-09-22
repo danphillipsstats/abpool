@@ -42,11 +42,9 @@ meaningful difference, inference may be performed using Rubin’s rules.
 
 The main function, `abpool()` generates ABpool posterior samples using
 model fits on multiple imputed datasets. `qqplot_rubin_abpool()`
-implements the diagnostic proposed in the accompanying paper by
-comparing the ABpool posterior distribution to Rubin’s
-$t$-approximation, where a meaningful difference may indicate Rubin’s
-rules is not properly accounting for higher order posterior moments such
-as skewness. `confint.abpool()` allows the calculation of credible
+implements the diagnostic for Rubin’s rules proposed in the accompanying
+paper by comparing the ABpool posterior distribution to Rubin’s
+$t$-approximation. `confint.abpool()` allows the calculation of credible
 intervals from ABpool samples. For users who have estimates and variance
 estimates from each imputation, rather than fitted model objects,
 `abpool_sample()` provides a lower-level interface.
@@ -59,7 +57,7 @@ distribution between ABpool and Rubin’s approximation, due to posterior
 skewness. Hence Rubin’s rules may be inappropriate, and we perform
 inference using ABpool.
 
-### Generate the data
+#### Generate the data
 
 ``` r
 # Generate data
@@ -73,7 +71,7 @@ X[1:(n-nobs)] <- NA
 log.data <- data.frame(Y = Y, X = X, Z = Z)
 ```
 
-### Impute the missing data and fit the analysis model
+#### Impute the missing data and fit the analysis model
 
 We generate 200 imputations, impute using predictive mean matching, and
 fit a logistic regression model.
@@ -85,7 +83,7 @@ imp <- mice::mice(log.data, m = m, method = "pmm", print = FALSE)
 fits.log.200 <- with(imp, glm(Y ~ X + Z, family = binomial))
 ```
 
-### Apply ABpool
+#### Apply ABpool
 
 The `abpool()` function samples ABpool posterior draws. We specify the
 complete-data degrees of freedom to be infinite, meaning we sample from
@@ -95,7 +93,7 @@ a normal distribution in this case.
 abpool.log.200 <- abpool(fits.log.200, dfcom = Inf)
 ```
 
-### Diagnostic for Rubin’s rules
+#### Diagnostic for Rubin’s rules
 
 We compare the ABpool posterior samples to the quantiles from Rubin’s
 $t$-approximation in a Q–Q plot. A meaningful discrepancy may indicate
@@ -110,7 +108,7 @@ The Q–Q plot indicates the ABpool posterior is skewed, which Rubin’s
 rules is unable to account for. We therefore proceed with inference
 using ABpool, as Rubin’s rules may not be appropriate in this scenario.
 
-### Perform inference using ABpool
+#### Perform inference using ABpool
 
 We increase the number of imputations to reduce the Monte-Carlo error
 from ABpool when generating posterior quantities such as credible
@@ -139,7 +137,7 @@ In this example, the ABpool posterior and Rubin’s $t$-approximation give
 very similar results. Hence Rubin’s rules is appropriate, and may be
 used for future inference.
 
-### Generate and analyse the multiply imputed data
+#### Generate and analyse the multiply imputed data
 
 ``` r
 set.seed(1)
@@ -156,7 +154,7 @@ imp <- mice::mice(lin.data, m = m, method = "norm", print = FALSE)
 fits.lin.200 <- with(imp, lm(Y ~ X + Z))
 ```
 
-### Diagnostic for Rubin’s rules
+#### Diagnostic for Rubin’s rules
 
 ``` r
 # Fit ABpool
@@ -169,7 +167,7 @@ The Q–Q plot does not indicate a meaningful difference in distribution
 between the ABpool samples and Rubin’s $t$-approximation. Hence we
 proceed using Rubin’s rules
 
-### Perform inference using Rubin’s rules
+#### Perform inference using Rubin’s rules
 
 ``` r
 pool.lin <- mice::pool(fits.lin.200)
@@ -196,8 +194,10 @@ estimates from each imputation, rather than fitted model objects,
 - `confint()` — generates an ABpool credible interval given an object of
   class `abpool`, as outputted from the `abpool()` function.
 - `abpool_sample()` — draws samples from ABpool given estimates and
-  variances for each imputation. Lower-level interface - to integrate
-  nicely with the rest of the package, use `abpool()` instead.
+  variances for each imputation. Lower-level interface for users who
+  have estimates and variance estimates from each imputation, rather
+  than fitted model objects. To integrate nicely with the rest of the
+  package, use `abpool()` instead.
 
 ## Documentation
 
