@@ -1,0 +1,16 @@
+bibentry(
+  bibtype = "Unpublished",
+  title = "Pooling after multiple imputation under posterior skewness",
+  author = c(
+    person("Daniel J.", "Phillips"),
+    person("Maria D.", "Christodoulou"),
+    person("David", "Steinsaltz")
+  ),
+  year = "2026",
+  note = "In preparation",
+  textVersion = paste(
+    "Phillips DJ, Christodoulou MD, Steinsaltz D.",
+    "Pooling after multiple imputation under posterior skewness.",
+    "(In preparation)."
+  )
+)
