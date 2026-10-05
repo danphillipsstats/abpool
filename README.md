@@ -4,9 +4,10 @@
 Implements approximate Bayesian pooling (ABpool) for statistical
 inference after multiple imputation as described in Phillips,
 Christodoulou and Steinsaltz, \`\`Pooling after multiple imputation
-under posterior skewness” (in preparation). Provides functions to
-generate approximate posterior samples, calculate credible intervals,
-and a diagnostic for Rubin’s rules.
+under posterior skewness” (2026). Provides functions to generate
+approximate posterior samples, calculate credible intervals, and a
+diagnostic for Rubin’s rules.
+<https://ora.ox.ac.uk/objects/uuid:1760d4ba-2e84-4dc7-8bf8-ab87d5fbb4ae>
 
 ## Installation
 

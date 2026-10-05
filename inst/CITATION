@@ -7,10 +7,12 @@ bibentry(
     person("David", "Steinsaltz")
   ),
   year = "2026",
-  note = "In preparation",
+  note = "Preprint, Oxford University Research Archive, University of Oxford",
+  url = "https://ora.ox.ac.uk/objects/uuid:1760d4ba-2e84-4dc7-8bf8-ab87d5fbb4ae",
   textVersion = paste(
-    "Phillips DJ, Christodoulou MD, Steinsaltz D.",
-    "Pooling after multiple imputation under posterior skewness.",
-    "(In preparation)."
+    "Phillips DJ, Christodoulou MD, Steinsaltz D (2026).",
+    "\"Pooling after multiple imputation under posterior skewness.\"",
+    "Preprint, Oxford University Research Archive, University of Oxford.",
+    "https://ora.ox.ac.uk/objects/uuid:1760d4ba-2e84-4dc7-8bf8-ab87d5fbb4ae"
   )
 )
